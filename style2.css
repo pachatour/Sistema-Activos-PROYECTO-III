@@ -1,0 +1,96 @@
+:root {
+    --background: #e0e5ec;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --primary: #3498db;
+  }
+   
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+  }
+   
+  body {
+    background-color: var(--background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+   
+  .container {
+    background-color: var(--background);
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: -10px -10px 20px var(--shadow-light),
+                 10px 10px 20px var(--shadow-dark);
+    width: 100%;
+    max-width: 500px;
+    transition: 0.3s ease;
+  }
+   
+  .container:hover {
+    box-shadow: -6px -6px 12px var(--shadow-light),
+                 6px 6px 12px var(--shadow-dark);
+  }
+   
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 26px;
+  }
+   
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+   
+  label {
+    margin-bottom: 6px;
+    color: #2c3e50;
+    font-weight: 500;
+    margin-top: 20px;
+  }
+   
+  input, select {
+    padding: 12px;
+    border: none;
+    border-radius: 15px;
+    background: var(--background);
+    box-shadow: inset -5px -5px 10px var(--shadow-light),
+                inset 5px 5px 10px var(--shadow-dark);
+    font-size: 14px;
+    color: #333;
+    transition: 0.2s ease-in-out;
+  }
+   
+  input:focus, select:focus {
+    outline: none;
+    box-shadow: inset -3px -3px 6px var(--shadow-light),
+                inset 3px 3px 6px var(--shadow-dark);
+  }
+   
+  button {
+    margin-top: 30px;
+    padding: 14px;
+    background: var(--background);
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--primary);
+    box-shadow: -6px -6px 12px var(--shadow-light),
+                 6px 6px 12px var(--shadow-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+   
+  button:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: inset -6px -6px 12px var(--shadow-light),
+                inset 6px 6px 12px var(--shadow-dark);
+  }
