@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        if ($password === $user['contrasena']) {
+        if ($password === $user['constrasena']) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['nombre_usuario'];
             $_SESSION['user_type'] = $user['id_tipo_usuario'];
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Neumorphism Estilo Amarillo-Azul</title>
+    <title>Iniciar Sesión</title>
     <style>
         :root {
             --base: #e0e5ec;

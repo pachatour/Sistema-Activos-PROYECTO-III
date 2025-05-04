@@ -1,5 +1,5 @@
 <?php
-$conexion = new mysqli("localhost", "root", "", "sistema");
+$conexion = new mysqli("localhost", "root", "", "sistema_activos");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar campos no vacíos (incluyendo espacios)
