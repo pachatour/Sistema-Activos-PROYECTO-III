@@ -1,9 +1,30 @@
+<?php
+$conexion = new mysqli("localhost", "root", "", "sistema_activos");
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
+}
+
+// Total de activos
+$res_activos = $conexion->query("SELECT COUNT(*) AS total FROM activos");
+$total_activos = $res_activos->fetch_assoc()['total'];
+
+// Total de activos operativos (id_estado = 1)
+$res_operativos = $conexion->query("SELECT COUNT(*) AS total FROM activos WHERE id_estado = 1");
+$activos_operativos = $res_operativos->fetch_assoc()['total'];
+
+// Total de reportes
+$res_reportes = $conexion->query("SELECT COUNT(*) AS total FROM reportes");
+$total_reportes = $res_reportes->fetch_assoc()['total'];
+
+
+$conexion->close();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Gestión de Activos</title>
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
         body {
@@ -35,7 +56,7 @@
         }
 
         .card.azul { background-color: #007bff; }
-        .card.blanco { background-color: #6c757d; }
+        .card.blanco { background-color:rgb(22, 184, 95); }
         .card.amarillo {
             background-color: #ffc107;
             color: #000;
@@ -326,34 +347,42 @@
         }
     </style>
 </head>
-
 <body>
     <div class="dashboard">
-        <div class="cards">
-            <div class="card azul">
-                <h5>Activos Totales</h5>
-                <h2>128</h2>
+        <div class="row">
+            <!-- Total de Activos -->
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Activos Totales</h5>
+                        <h2 class="card-text"><?php echo $total_activos; ?></h2>
+                    </div>
+                </div>
             </div>
-            <div class="card blanco">
-                <h5>Usuarios Registrados</h5>
-                <h2>37</h2>
+
+            <!-- Activos Operativos -->
+            <div class="col-md-4">
+                <div class="card text-white bg-secondary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Activos Operativos</h5>
+                        <h2 class="card-text"><?php echo $activos_operativos; ?></h2>
+                    </div>
+                </div>
             </div>
-            <div class="card amarillo">
-                <h5>Reportes Generados</h5>
-                <h2>12</h2>
+
+            <!-- Reportes Generados -->
+            <div class="col-md-4">
+                <div class="card text-dark bg-warning mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Reportes Generados</h5>
+                        <h2 class="card-text"><?php echo $total_reportes; ?></h2>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="content">
-            <div class="metrics">
-                <h3>Activos por Estado</h3>
-                <ul>
-                    <li><span>Operativo</span><span class="badge">89</span></li>
-                    <li><span>En reparación</span><span class="badge">25</span></li>
-                    <li><span>De baja</span><span class="badge">14</span></li>
-                </ul>
-            </div>
-
+    </div>
+</body>
+</html>
             <div class="events">
                 <h3>Últimos Reportes</h3>
                 <ul>
