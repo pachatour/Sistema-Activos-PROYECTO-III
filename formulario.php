@@ -313,35 +313,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="container">
     <h1>Registro de Activo Fijo</h1>
     
-    <form method="POST" id="registroForm" onsubmit="return validarFormulario()">
-      <label>Nombre del activo:</label>
-      <input type="text" name="nombre" required 
-             pattern=".*\S+.*" 
-             title="El nombre no puede estar vacío"
-             oninput="validarCampo(this)">
-      <div class="validacion-error" id="errorNombre">El nombre no puede contener solo espacios</div>
+    <form method="POST" id="formularioActivo" onsubmit="return validarFormulario()">
+    <label>Nombre del activo:</label>
+      <input type="text" name="nombre" required>
 
       <label>Descripción:</label>
-      <input type="text" name="descripcion" required
-             pattern=".*\S+.*"
-             title="La descripción no puede estar vacía"
-             oninput="validarCampo(this)">
-      <div class="validacion-error" id="errorDescripcion">La descripción no puede contener solo espacios</div>
+      <input type="text" name="descripcion" required>
 
-      <label>ID Estado (1-4):</label>
-      <input type="number" name="id_estado" min="1" max="4" required>
-      <div id="errorEstado" class="error"></div>
+      <label>Estado:</label>
+      <select name="id_estado" required>
+        <option value="">Seleccione un estado</option>
+        <option value="1">Disponible</option>
+        <option value="2">En uso</option>
+        <option value="3">Mantenimiento</option>
+        <option value="4">Baja</option>
+      </select>
 
-      <label>ID Sitio (1-3):</label>
-      <input type="number" name="id_sitio" min="1" max="3" required>
-      <div id="errorSitio" class="error"></div>
+      <label>Sitio:</label>
+      <select name="id_sitio" required>
+        <option value="">Seleccione un sitio</option>
+        <option value="1">Oficina Central</option>
+        <option value="2">Sucursal Norte</option>
+        <option value="3">Sucursal Sur</option>
+      </select>
 
-      <label>ID Categoría (1-9):</label>
-      <input type="number" name="id_categoria" min="1" max="9" required>
-      <div id="errorCategoria" class="error"></div>
+      <label>Categoría:</label>
+      <select name="id_categoria" required>
+        <option value="">Seleccione una categoría</option>
+        <option value="1">Computadora</option>
+        <option value="2">Impresora</option>
+        <option value="3">Mueble</option>
+        <option value="4">Vehículo</option>
+        <option value="5">Herramienta</option>
+        <option value="6">Celular</option>
+        <option value="7">Router</option>
+        <option value="8">Tablet</option>
+        <option value="9">Otro</option>
+      </select>
 
       <label>Código de Barras (opcional):</label>
-      <input type="text" name="codigoBarras" placeholder="(se puede dejar vacío)">
+      <input type="text" name="codigoBarras">
 
       <button type="submit">Registrar Activo</button>
     </form>
@@ -413,5 +424,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       return valido;
     }
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('formularioActivo');
+  const nombreInput = form.querySelector('input[name="nombre"]');
+  const descripcionInput = form.querySelector('input[name="descripcion"]');
+  const idEstadoInput = form.querySelector('input[name="id_estado"]');
+  const idSitioInput = form.querySelector('input[name="id_sitio"]');
+  const idCategoriaInput = form.querySelector('input[name="id_categoria"]');
+  const campos = form.querySelectorAll('input, select, textarea');
+
+  // Validación individual en tiempo real
+  campos.forEach(input => {
+    input.addEventListener('input', function () {
+      validarCampo(this);
+    });
+  });
+
+  function validarCampo(input) {
+    const nombreCampo = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+    const errorElement = document.getElementById(`error${nombreCampo}`);
+    
+    if (input.value.trim() === '') {
+      mostrarError(input, 'Este campo no puede estar vacío');
+      if (errorElement) errorElement.style.display = 'block';
+    } else {
+      limpiarError(input);
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  }
+
+  // Validación de nombre único
+  nombreInput.addEventListener('blur', function () {
+    const nombre = this.value.trim();
+    if (nombre !== '') {
+      fetch('validar_activo.php?nombre=' + encodeURIComponent(nombre))
+        .then(response => response.json())
+        .then(data => {
+          if (data.existe) {
+            mostrarError(nombreInput, 'Ya existe un activo con este nombre');
+          } else {
+            limpiarError(nombreInput);
+          }
+        });
+    }
+  });
+
+  // Validación final al enviar
+  form.addEventListener('submit', function (e) {
+    let valido = true;
+
+    campos.forEach(campo => {
+      if (campo.hasAttribute('required') && campo.value.trim() === '') {
+        mostrarError(campo, 'Este campo es obligatorio');
+        valido = false;
+      }
+    });
+
+    // Validar rangos
+    if (idEstadoInput.value < 1 || idEstadoInput.value > 4) {
+      mostrarError(idEstadoInput, 'El ID Estado debe ser entre 1 y 4');
+      valido = false;
+    }
+
+    if (idSitioInput.value < 1 || idSitioInput.value > 3) {
+      mostrarError(idSitioInput, 'El ID Sitio debe ser entre 1 y 3');
+      valido = false;
+    }
+
+    if (idCategoriaInput.value < 1 || idCategoriaInput.value > 9) {
+      mostrarError(idCategoriaInput, 'El ID Categoría debe ser entre 1 y 9');
+      valido = false;
+    }
+
+    if (!valido) e.preventDefault();
+  });
+
+  function mostrarError(input, mensaje) {
+    let error = input.nextElementSibling;
+    if (!error || !error.classList.contains('error')) {
+      error = document.createElement('div');
+      error.className = 'error';
+      input.parentNode.insertBefore(error, input.nextSibling);
+    }
+    error.textContent = mensaje;
+    input.classList.add('invalido');
+    input.setCustomValidity(mensaje);
+  }
+
+  function limpiarError(input) {
+    let error = input.nextElementSibling;
+    if (error && error.classList.contains('error')) {
+      error.remove();
+    }
+    input.classList.remove('invalido');
+    input.setCustomValidity('');
+  }
+});
+</script>
 </body>
 </html>
