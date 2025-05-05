@@ -567,9 +567,9 @@ $conexion->close();
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>ID Estado</th>
-                    <th>ID Categoría</th>
-                    <th>ID Sitio</th>
+                    <th>Estado</th>
+                    <th>Categoría</th>
+                    <th>Sitio</th>
                     <th>Cantidad</th>
                 </tr>
             </thead>
@@ -580,7 +580,14 @@ $conexion->close();
                     die("Error de conexión: " . $conexion->connect_error);
                 }
 
-                $consulta = "SELECT * FROM activos";
+                $consulta = "SELECT a.*, 
+                            ea.nombre as estado_nombre, 
+                            c.nombre as categoria_nombre, 
+                            s.nombre as sitio_nombre 
+                            FROM activos a
+                            LEFT JOIN estado_activos ea ON a.id_estado = ea.id
+                            LEFT JOIN categorias c ON a.id_categoria = c.id
+                            LEFT JOIN sitios s ON a.id_sitio = s.id";
                 $resultado = $conexion->query($consulta);
 
                 if ($resultado->num_rows > 0) {
@@ -589,14 +596,14 @@ $conexion->close();
                         echo "<td>" . $fila['id'] . "</td>";
                         echo "<td>" . htmlspecialchars($fila['nombre']) . "</td>";
                         echo "<td>" . htmlspecialchars($fila['descripcion']) . "</td>";
-                        echo "<td>" . $fila['id_estado'] . "</td>";
-                        echo "<td>" . $fila['id_categoria'] . "</td>";
-                        echo "<td>" . $fila['id_sitio'] . "</td>";
+                        echo "<td>" . htmlspecialchars($fila['estado_nombre']) . "</td>";
+                        echo "<td>" . htmlspecialchars($fila['categoria_nombre']) . "</td>";
+                        echo "<td>" . htmlspecialchars($fila['sitio_nombre']) . "</td>";
                         echo "<td>" . $fila['cantidad'] . "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='8'>No se encontraron activos.</td></tr>";
+                    echo "<tr><td colspan='7'>No se encontraron activos.</td></tr>";
                 }
                 $conexion->close();
                 ?>
@@ -687,5 +694,6 @@ $conexion->close();
             document.getElementById('updateAssetForm').submit();
         });
     </script>
+    
 </body>
 </html>
