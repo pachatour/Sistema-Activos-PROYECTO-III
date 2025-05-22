@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - Administración de Activos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            width: 100%;
+            background-color: rgba(0, 30, 60, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .menu-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px 20px;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            width: 220px;
+            height: 120px;
+            background-color: rgba(0, 30, 60, 0.9);
+            border-radius: 12px;
+            border: 2px solid #FFD700;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .menu-item i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .menu-item:hover {
+            background-color: #00264d;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .menu-item {
+                width: 100%;
+                height: auto;
+                padding: 20px 0;
+            }
+
+            .navbar h1 {
+                font-size: 1.1rem;
+            }
+
+            .navbar img {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMLf1emihqA5SgR4Eo9cdwbQdNxLRLcEOg5g&s" alt="Logo Univalle">
+        <h1>ADMINISTRACIÓN DE ACTIVOS</h1>
+    </div>
+
+    <div class="menu-container">
+        <a href="inventario.html" class="menu-item">
+            <i class="fas fa-boxes"></i>
+            Inventario
+        </a>
+        <a href="reportes.html" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            Reportes
+        </a>
+        <a href="historiales.html" class="menu-item">
+            <i class="fas fa-history"></i>
+            Historiales
+        </a>
+        <a href="biblioteca.html" class="menu-item">
+            <i class="fas fa-book"></i>
+            Biblioteca
+        </a>
+        <a href="registrar.html" class="menu-item">
+            <i class="fas fa-user-plus"></i>
+            Registrar
+        </a>
+    </div>
+
+    <footer>
+        <p>© 2025 Luz a las Naciones</p>
+    </footer>
+</body>
+</html>
