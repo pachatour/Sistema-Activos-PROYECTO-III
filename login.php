@@ -25,9 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             switch ($user['id_tipo_usuario']) {
                 case 1: header("Location: dashboard_admin.html"); break;
-                case 2: header("Location: manager_dashboard.php"); break;
-                case 3: header("Location: biblio_dashboard.php"); break;
-                case 4: header("Location: registro_activos.php"); break;
+                case 2: header("Location: formmmmulario.php"); break;
+                case 3: header("Location: formulario.php"); break;
+                case 4: header("Location: biblio_dashboard.php"); break;
                 default: header("Location: login.php");
             }
             exit();
