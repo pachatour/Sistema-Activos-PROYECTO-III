@@ -1,7 +1,6 @@
 <?php
 include 'conexion.php';
 
-
 // Obtener filtros desde POST
 $filtros = [
     'categoria' => $_POST['categoria'] ?? '',
@@ -9,14 +8,16 @@ $filtros = [
     'sitio' => $_POST['sitio'] ?? ''
 ];
 
-// Función para obtener opciones de filtros
-function getOptions($pdo, $tabla) {
-    $stmt = $pdo->query("SELECT id, nombre FROM $tabla");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+function getOptions($conn, $tabla) {
+    $result = $conn->query("SELECT id, nombre FROM $tabla");
+    $options = [];
+    while ($row = $result->fetch_assoc()) {
+        $options[] = $row;
+    }
+    return $options;
 }
 
-// Función para obtener activos con reportes
-function getActivosFiltrados($pdo, $filtros) {
+function getActivosFiltrados($conn, $filtros) {
     $sql = "SELECT a.id, a.nombre, a.codigoBarras, c.nombre AS categoria, e.nombre AS estado,
                    s.nombre AS sitio, a.cantidad, r.descripcion AS reporte
             FROM activos a
@@ -43,24 +44,34 @@ function getActivosFiltrados($pdo, $filtros) {
         $params[] = $filtros['sitio'];
     }
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($params) {
+        $stmt = $conn->prepare($sql);
+        $types = str_repeat('i', count($params));
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        $result = $conn->query($sql);
+    }
+
+    $activos = [];
+    while ($row = $result->fetch_assoc()) {
+        $activos[] = $row;
+    }
+    return $activos;
 }
 
-// Obtener datos
-$categorias = getOptions($pdo, 'categorias');
-$estados = getOptions($pdo, 'estado_activos');
-$sitios = getOptions($pdo, 'sitios');
-$activos = getActivosFiltrados($pdo, $filtros);
+$categorias = getOptions($conn, 'categorias');
+$estados = getOptions($conn, 'estado_activos');
+$sitios = getOptions($conn, 'sitios');
+$activos = getActivosFiltrados($conn, $filtros);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Activos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <title>Reporte de Activos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -75,8 +86,6 @@ $activos = getActivosFiltrados($pdo, $filtros);
                         url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
             background-size: cover;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .navbar {
@@ -90,104 +99,269 @@ $activos = getActivosFiltrados($pdo, $filtros);
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
-        .navbar img {
-            height: 50px;
-        }
-
         .navbar h1 {
             font-size: 1.5rem;
             color: white;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
         }
 
-        .container {
-            background-color: rgba(0, 30, 60, 0.8);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        .dashboard {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        label, select, th, td {
-            color: #fff;
+        .form-container {
+            background-color: rgba(0, 30, 60, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid #FFD700;
+            border-radius: 6px;
+            color: white;
+            outline: none;
+        }
+
+        .form-select:focus {
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
             background-color: #FFD700;
-            color: #000;
-            border: none;
+            color: #00264d;
         }
 
         .btn-primary:hover {
-            background-color: #e6c200;
+            background-color: #ffe033;
         }
 
-        .btn-secondary, .btn-danger, .btn-success {
-            border: none;
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
         }
 
-        .table-bordered {
-            border-color: #fff;
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
 
-        footer {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(6, 43, 92, 0.94);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-top: 20px;
+        }
+
+        .inventory-table th {
+            background-color: #FFD700;
+            color: #00264d;
             padding: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .inventory-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .inventory-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inventory-table tr:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-new {
+            background-color: #28a745;
+        }
+
+        .status-used {
+            background-color: #17a2b8;
+        }
+
+        .status-damaged {
+            background-color: #dc3545;
+        }
+
+        .status-repair {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .status-renew {
+            background-color: #6c757d;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .inventory-table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
-
 </head>
 <body>
-<div class="container mt-4">
-    <h1>Reporte y Registro de Activos</h1>
-    <form method="post" class="row g-3 mb-4">
-        <div class="col-md-4">
-            <label class="form-label">Categoría</label>
-            <select name="categoria" class="form-select">
-                <option value="">Todas</option>
-                <?php foreach ($categorias as $cat): ?>
-                    <option value="<?= $cat['id'] ?>" <?= $cat['id'] == $filtros['categoria'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($cat['nombre']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Estado</label>
-            <select name="estado" class="form-select">
-                <option value="">Todos</option>
-                <?php foreach ($estados as $est): ?>
-                    <option value="<?= $est['id'] ?>" <?= $est['id'] == $filtros['estado'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($est['nombre']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Ubicación</label>
-            <select name="sitio" class="form-select">
-                <option value="">Todas</option>
-                <?php foreach ($sitios as $sit): ?>
-                    <option value="<?= $sit['id'] ?>" <?= $sit['id'] == $filtros['sitio'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($sit['nombre']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="col-12">
-            <button class="btn btn-primary">Filtrar</button>
-            <a href="reportes.php" class="btn btn-secondary">Limpiar</a>
-            <a href="export_pdf.php?<?= http_build_query($filtros) ?>" class="btn btn-danger">Exportar PDF</a>
-            <a href="export_excel.php?<?= http_build_query($filtros) ?>" class="btn btn-success">Exportar Excel</a>
-        </div>
-    </form>
+    <nav class="navbar">
+        <h1><i class="fas fa-clipboard-list"></i> Reporte de Activos</h1>
+        <a href="biblio_dashboard.php" style="color:#FFD700;text-decoration:none;font-weight:bold;">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </nav>
 
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="table-light">
+    <div class="dashboard">
+        <div class="form-container">
+            <form method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Categoría</label>
+                        <select name="categoria" class="form-select">
+                            <option value="">Todas</option>
+                            <?php foreach ($categorias as $cat): ?>
+                                <option value="<?= $cat['id'] ?>" <?= $cat['id'] == $filtros['categoria'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($cat['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" class="form-select">
+                            <option value="">Todos</option>
+                            <?php foreach ($estados as $est): ?>
+                                <option value="<?= $est['id'] ?>" <?= $est['id'] == $filtros['estado'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($est['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ubicación</label>
+                        <select name="sitio" class="form-select">
+                            <option value="">Todas</option>
+                            <?php foreach ($sitios as $sit): ?>
+                                <option value="<?= $sit['id'] ?>" <?= $sit['id'] == $filtros['sitio'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($sit['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <a href="reportes.php" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpiar
+                    </a>
+                    <a href="export_pdf.php?<?= http_build_query($filtros) ?>" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </a>
+                    <a href="export_excel.php?<?= http_build_query($filtros) ?>" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <table class="inventory-table">
+            <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
@@ -206,19 +380,88 @@ $activos = getActivosFiltrados($pdo, $filtros);
                         <td><?= htmlspecialchars($a['nombre']) ?></td>
                         <td><?= htmlspecialchars($a['codigoBarras']) ?></td>
                         <td><?= htmlspecialchars($a['categoria']) ?></td>
-                        <td><?= htmlspecialchars($a['estado']) ?></td>
+                        <td>
+                            <?php 
+                            $clase_estado = '';
+                            switch(strtolower($a['estado'])) {
+                                case 'nuevo': $clase_estado = 'status-new'; break;
+                                case 'usado': $clase_estado = 'status-used'; break;
+                                case 'dañado': $clase_estado = 'status-damaged'; break;
+                                case 'en reparación': $clase_estado = 'status-repair'; break;
+                                case 'necesita renovacion': $clase_estado = 'status-renew'; break;
+                                default: $clase_estado = 'status-used';
+                            }
+                            ?>
+                            <span class="status-badge <?= $clase_estado ?>">
+                                <?= htmlspecialchars($a['estado']) ?>
+                            </span>
+                        </td>
                         <td><?= htmlspecialchars($a['sitio']) ?></td>
                         <td><?= $a['cantidad'] ?></td>
                         <td><?= $a['reporte'] ? htmlspecialchars($a['reporte']) : 'Sin reportes' ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (empty($activos)): ?>
-                    <tr><td colspan="8" class="text-center">No se encontraron activos con los filtros aplicados.</td></tr>
+                    <tr>
+                        <td colspan="8" class="text-center">No se encontraron activos con los filtros aplicados</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
-</div>
+
+    <script>
+        // Función para filtrar la tabla en tiempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.id = 'searchInput';
+            searchInput.placeholder = 'Buscar activo...';
+            searchInput.style.marginLeft = '10px';
+            searchInput.style.padding = '8px';
+            searchInput.style.borderRadius = '20px';
+            searchInput.style.border = '1px solid #FFD700';
+            searchInput.style.background = 'rgba(255,255,255,0.1)';
+            searchInput.style.color = 'white';
+            searchInput.style.outline = 'none';
+            
+            const searchContainer = document.createElement('div');
+            searchContainer.style.display = 'flex';
+            searchContainer.style.alignItems = 'center';
+            searchContainer.style.marginBottom = '20px';
+            
+            const searchIcon = document.createElement('i');
+            searchIcon.className = 'fas fa-search';
+            searchIcon.style.marginRight = '10px';
+            
+            searchContainer.appendChild(searchIcon);
+            searchContainer.appendChild(searchInput);
+            
+            const table = document.querySelector('.inventory-table');
+            table.parentNode.insertBefore(searchContainer, table);
+            
+            searchInput.addEventListener('input', function() {
+                const searchValue = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.inventory-table tbody tr');
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    let found = false;
+                    
+                    for (let i = 0; i < cells.length; i++) {
+                        if (cells[i].textContent.toLowerCase().includes(searchValue)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    row.style.display = found ? '' : 'none';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
- 
+<?php
+$conn->close();
+?>
