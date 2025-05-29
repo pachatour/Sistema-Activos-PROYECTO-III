@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_permissions'] = $user['parametro_edit_config'];
 
             switch ($user['id_tipo_usuario']) {
-                case 1: header("Location: admin_dashboard.php"); break;
+                case 1: header("Location: dashboard_admin.php"); break;
                 case 2: header("Location: manager_dashboard.php"); break;
                 case 3: header("Location: formulario.php"); break;
                 case 4: header("Location: biblio_dashboard.php"); break;

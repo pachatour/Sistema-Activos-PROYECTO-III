@@ -351,69 +351,6 @@ $prestamos_activos = $conn->query("SELECT p.*,
             </form>
         </div>
 
-        <!-- Popup para nuevo estudiante -->
-        <div id="popupEstudiante" class="popup-overlay">
-            <div class="popup-content">
-                <span class="close-popup" onclick="cerrarPopupEstudiante()">&times;</span>
-                <h2 style="color: #FFD700; margin-bottom: 20px;">
-                    <i class="fas fa-user-plus"></i> Nuevo Estudiante
-                </h2>
-                <form id="formEstudiante">
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="apellido">Apellido:</label>
-                        <input type="text" id="apellido" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="codigo">Código de Estudiante:</label>
-                        <input type="text" id="codigo" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email (opcional):</label>
-                        <input type="email" id="email" class="form-control">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="nivel">Nivel:</label>
-                        <select id="nivel" class="form-control" required>
-                            <option value="primario">Primario</option>
-                            <option value="secundario">Secundario</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="curso">Curso:</label>
-                        <select id="curso" class="form-control" required>
-                            <option value="primero">Primero</option>
-                            <option value="segundo">Segundo</option>
-                            <option value="tercero">Tercero</option>
-                            <option value="cuarto">Cuarto</option>
-                            <option value="quinto">Quinto</option>
-                            <option value="sexto">Sexto</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="paralelo">Paralelo:</label>
-                        <select id="paralelo" class="form-control" required>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                        </select>
-                    </div>
-                    
-                    <button type="button" class="btn btn-primary" onclick="registrarEstudiante()">
-                        <i class="fas fa-save"></i> Guardar Estudiante
-                    </button>
-                </form>
-            </div>
-        </div>
-
         <!-- Listado de préstamos activos -->
         <h2 style="color: #FFD700; margin: 30px 0 20px 0;">
             <i class="fas fa-list"></i> Préstamos Activos
