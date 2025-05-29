@@ -2,13 +2,13 @@
 session_start();
 require_once 'conexion.php';
 
-// Verificar sesión y permisos
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
     exit();
 }
 
-$usuario_id = $_SESSION['usuario_id'];
+$usuario_id = $_SESSION['user_id'];
 $prestador = $conn->query("SELECT u.*, tu.nombre as tipo_usuario 
                           FROM usuarios u
                           JOIN tipo_usuarios tu ON u.id_tipo_usuario = tu.id
@@ -19,7 +19,6 @@ $prestamos_activos = $conn->query("SELECT p.*,
                                   a.nombre as activo_nombre, 
                                   a.codigoBarras,
                                   CONCAT(e.nombre, ' ', e.apellido) as estudiante_nombre,
-                                  e.codigo_estudiante,
                                   u.nombre_usuario as prestador_nombre
                                   FROM prestamos p
                                   JOIN activos a ON p.id_activo = a.id
@@ -34,9 +33,155 @@ $prestamos_activos = $conn->query("SELECT p.*,
     <title>Gestión de Préstamos de Libros</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos anteriores... */
-        
-        /* Popup styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            width: 100%;
+            background-color: rgba(0, 30, 60, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .dashboard {
+            padding: 40px 10px 30px 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .stats-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(0, 30, 60, 0.9);
+            border-radius: 12px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            padding: 30px 38px;
+            align-items: center;
+            gap: 10px;
+            color: #FFD700;
+            min-width: 180px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        .stat-card p {
+            color: #fff;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        #searchInput {
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid #FFD700;
+            outline: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            margin-left: 10px;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(255,255,255,0.97);
+            margin-top: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #2c3e50;
+        }
+
+        .inventory-table th, .inventory-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .inventory-table thead {
+            background-color: #FFD700;
+            color: #003366;
+        }
+
+        .inventory-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .inventory-table tbody tr:hover {
+            background-color: #ffe033;
+        }
+
+        .form-container {
+            background: rgba(0, 30, 60, 0.9);
+            border-radius: 12px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            padding: 30px 38px;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .form-group label {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .form-control, select, input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px 0;
+            border-radius: 6px;
+            border: 1px solid #FFD700;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .btn.btn-primary, button[type="submit"] {
+            background-color: #FFD700;
+            color: #003366;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn.btn-primary:hover, button[type="submit"]:hover {
+            background-color: #ffe033;
+            color: #003366;
+        }
+
         .popup-overlay {
             display: none;
             position: fixed;
@@ -60,6 +205,7 @@ $prestamos_activos = $conn->query("SELECT p.*,
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            color: #fff;
         }
         
         .close-popup {
@@ -102,6 +248,22 @@ $prestamos_activos = $conn->query("SELECT p.*,
         .badge-alerta {
             background-color: #ffc107;
             color: #000;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard {
+                padding: 10px 2px;
+            }
+            .stats-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .form-container {
+                padding: 18px 8px;
+            }
+            .inventory-table th, .inventory-table td {
+                padding: 8px 6px;
+            }
         }
     </style>
 </head>
@@ -166,7 +328,6 @@ $prestamos_activos = $conn->query("SELECT p.*,
                             ?>
                             <option value="<?= $estudiante['id_estudiante'] ?>">
                                 <?= htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido']) ?> 
-                                (<?= $estudiante['codigo_estudiante'] ?>)
                             </option>
                             <?php endwhile; ?>
                         </select>
@@ -299,7 +460,6 @@ $prestamos_activos = $conn->query("SELECT p.*,
                     <td><?= htmlspecialchars($prestamo['codigoBarras']) ?></td>
                     <td>
                         <?= htmlspecialchars($prestamo['estudiante_nombre']) ?>
-                        <small>(<?= $prestamo['codigo_estudiante'] ?>)</small>
                     </td>
                     <td><?= date('d/m/Y', strtotime($prestamo['fecha_prestamo'])) ?></td>
                     <td><?= date('d/m/Y', strtotime($prestamo['fecha_devolucion_esperada'])) ?></td>
