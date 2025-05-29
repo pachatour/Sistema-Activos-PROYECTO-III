@@ -1,5 +1,5 @@
 <?php
-$conexion = new mysqli("localhost", "root", "", "sistema_activos");
+include 'conexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar campos no vacíos (incluyendo espacios)
@@ -139,7 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -149,172 +148,144 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <!-- Confetti JS -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --background: #e0e5ec;
-      --shadow-light: #ffffff;
-      --shadow-dark: #a3b1c6;
-      --primary: #3498db;
-      --error: #e74c3c;
-      --success: #2ecc71;
-    }
-
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Arial', sans-serif;
     }
 
     body {
-      background-color: var(--background);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      color: #fff;
+      background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                  url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+      background-size: cover;
       min-height: 100vh;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
     }
 
-    .container {
-      background-color: var(--background);
-      padding: 40px;
-      border-radius: 30px;
-      box-shadow: -10px -10px 20px var(--shadow-light),
-                   10px 10px 20px var(--shadow-dark);
+    .navbar {
       width: 100%;
-      max-width: 500px;
-      transition: all 0.3s ease;
-      animation: fadeIn 0.5s ease-out;
+      background-color: rgba(0, 30, 60, 0.95);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .navbar h1 {
+      font-size: 1.5rem;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-container {
+      background-color: rgba(0, 30, 60, 0.92);
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      max-width: 700px; /* Aumenta el ancho máximo */
+      margin: 40px auto;
+      padding: 40px 32px 32px 32px;
+      border: 2px solid #FFD700;
+      animation: fadeIn 0.5s ease;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
     }
 
     h1 {
       text-align: center;
-      color: #2c3e50;
+      color: #FFD700;
       margin-bottom: 30px;
-      font-size: 26px;
+      font-size: 1.6rem;
       font-weight: 600;
+      letter-spacing: 1px;
     }
 
     form {
       display: flex;
       flex-direction: column;
+      gap: 18px;
     }
 
     label {
-      margin-bottom: 8px;
-      color: #2c3e50;
+      color: #FFD700;
       font-weight: 500;
-      margin-top: 20px;
-      font-size: 14px;
+      margin-bottom: 5px;
+      font-size: 1rem;
+      margin-top: 0;
     }
 
     input, select {
       padding: 12px 15px;
       border: none;
-      border-radius: 15px;
-      background: var(--background);
-      box-shadow: inset -5px -5px 10px var(--shadow-light),
-                  inset 5px 5px 10px var(--shadow-dark);
-      font-size: 14px;
-      color: #333;
-      transition: all 0.3s ease;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 1rem;
+      transition: background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    input:focus {
+    input:focus, select:focus {
       outline: none;
-      box-shadow: inset -2px -2px 5px var(--shadow-light),
-                  inset 2px 2px 5px var(--shadow-dark),
-                  0 0 0 2px rgba(52, 152, 219, 0.3);
-    }
-
-    input:invalid {
-      box-shadow: inset -5px -5px 10px var(--shadow-light),
-                  inset 5px 5px 10px var(--shadow-dark),
-                  0 0 0 2px rgba(231, 76, 60, 0.3);
+      background: rgba(255,255,255,0.18);
+      box-shadow: 0 0 0 2px #FFD700;
     }
 
     button {
-      margin-top: 30px;
+      margin-top: 18px;
       padding: 14px;
-      background: var(--background);
+      background: #FFD700;
       border: none;
       border-radius: 20px;
       font-weight: bold;
-      font-size: 15px;
-      color: var(--primary);
-      box-shadow: -6px -6px 12px var(--shadow-light),
-                   6px 6px 12px var(--shadow-dark);
+      font-size: 1.1rem;
+      color: #00264d;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
       cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      transition: background 0.3s, color 0.3s, transform 0.2s;
     }
 
     button:hover {
-      background: var(--primary);
-      color: #fff;
-      transform: translateY(-2px);
+      background: #fffbe6;
+      color: #00264d;
+      transform: translateY(-2px) scale(1.03);
     }
 
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 5px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.5);
-      opacity: 0;
-      border-radius: 100%;
-      transform: scale(1, 1) translate(-50%);
-      transform-origin: 50% 50%;
-    }
-
-    button:focus:not(:active)::after {
-      animation: ripple 0.6s ease-out;
-    }
-
-    @keyframes ripple {
-      0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-      }
-      100% {
-        transform: scale(20, 20);
-        opacity: 0;
-      }
-    }
-
-    .error {
-      color: var(--error);
-      font-size: 12px;
-      margin-top: 5px;
+    .error, .validacion-error {
+      color: #e74c3c;
+      font-size: 0.95em;
+      margin-top: 2px;
+      margin-bottom: -10px;
       display: none;
     }
 
-    .validacion-error {
-      color: var(--error);
-      font-size: 12px;
-      margin-top: 5px;
-      display: none;
+    @media (max-width: 600px) {
+      .form-container {
+        padding: 20px 8px 18px 8px;
+        max-width: 98vw;
+      }
+      h1 {
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Registro de Activo Fijo</h1>
-    
+  <nav class="navbar">
+    <h1><i class="fas fa-boxes"></i> Registro de Activo Fijo</h1>
+  </nav>
+  <div class="form-container">
     <form method="POST" id="formularioActivo" onsubmit="return validarFormulario()">
-    <label>Nombre del activo:</label>
+      <label>Nombre del activo:</label>
       <input type="text" name="nombre" required>
 
       <label>Descripción:</label>
