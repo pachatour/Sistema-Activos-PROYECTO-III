@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Historiales - Administración de Activos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            width: 100%;
+            background-color: rgba(0, 30, 60, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Estilos para los paneles de acción */
+        .action-panels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            flex: 1;
+            min-width: 500px;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .panel h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #001e3c;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #001e3c;
+            color: white;
+            border: 2px solid #FFD700;
+        }
+
+        .btn-primary:hover {
+            background-color: #003366;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            border-left: 4px solid #FFD700;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-date {
+            color: #6c757d;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .history-details {
+            margin-top: 8px;
+            color: #333;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .badge-move {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .badge-assign {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-modify {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .badge-remove {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Estilos para el modal de confirmación */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            color: #333;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 50%;
+            max-width: 500px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 2px solid #FFD700;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            color: #001e3c;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .success-message {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        #historialContenido {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .panel {
+                min-width: 100%;
+            }
+            
+            .navbar h1 {
+                font-size: 1.1rem;
+            }
+
+            .navbar img {
+                height: 40px;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMLf1emihqA5SgR4Eo9cdwbQdNxLRLcEOg5g&s" alt="Logo Univalle">
+        <h1>HISTORIALES - ADMINISTRACIÓN DE ACTIVOS</h1>
+    </div>
+
+    <div class="container">
+        <!-- Paneles de acción -->
+        <div class="action-panels">
+            <!-- Panel para actualizar estados de activos -->
+            <div class="panel">
+                <h3><i class="fas fa-edit"></i> Actualizar Estado de Activo</h3>
+                <form id="updateAssetForm" method="post" action="actualizar_estado.php">
+                    <div class="form-group">
+                        <label for="activo_id"><i class="fas fa-laptop"></i> Seleccionar Activo:</label>
+                        <select class="form-control" id="activo_id" name="activo_id" required>
+                            <option value="">-- Seleccionar activo --</option>
+                            <!-- Opciones se cargarían desde la base de datos -->
+                            <option value="1">Proyector AULA 3 (Equipos Audiovisuales)</option>
+                            <option value="2">Impresora Oficina (Equipos de Oficina)</option>
+                            <option value="3">Router Principal (Equipos de Red)</option>
+                            <option value="4">Computadora LAB-01 (Equipos de Cómputo)</option>
+                            <option value="5">Escritorio Administración (Mobiliario)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo_estado"><i class="fas fa-info-circle"></i> Nuevo Estado:</label>
+                        <select class="form-control" id="nuevo_estado" name="nuevo_estado" required>
+                            <option value="">-- Seleccionar estado --</option>
+                            <option value="1">Operativo</option>
+                            <option value="2">En Mantenimiento</option>
+                            <option value="3">Fuera de Servicio</option>
+                            <option value="4">En Reparación</option>
+                            <option value="5">Dado de Baja</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sitio_destino"><i class="fas fa-map-marker-alt"></i> Sitio Destino:</label>
+                        <select class="form-control" id="sitio_destino" name="sitio_destino" required>
+                            <option value="">-- Seleccionar sitio --</option>
+                            <option value="1">Aula 101</option>
+                            <option value="2">Aula 102</option>
+                            <option value="3">Laboratorio de Cómputo</option>
+                            <option value="4">Oficina Administrativa</option>
+                            <option value="5">Biblioteca</option>
+                            <option value="6">Almacén</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="observaciones"><i class="fas fa-comment"></i> Observaciones:</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Ingrese observaciones sobre el cambio de estado..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Actualizar Estado
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Mensajes de confirmación (se mostrarían dinámicamente) -->
+                <div id="messageContainer"></div>
+            </div>
+
+            <!-- Panel para ver historial de activos -->
+            <div class="panel">
+                <h3><i class="fas fa-history"></i> Historial de Activos</h3>
+                <div class="form-group">
+                    <label for="activo_historial"><i class="fas fa-search"></i> Seleccionar Activo:</label>
+                    <select class="form-control" id="activo_historial" name="activo_historial" onchange="cargarHistorial()">
+                        <option value="">-- Seleccionar activo --</option>
+                        <option value="1">Proyector AULA 3 (Equipos Audiovisuales)</option>
+                        <option value="2">Impresora Oficina (Equipos de Oficina)</option>
+                        <option value="3">Router Principal (Equipos de Red)</option>
+                        <option value="4">Computadora LAB-01 (Equipos de Cómputo)</option>
+                        <option value="5">Escritorio Administración (Mobiliario)</option>
+                    </select>
+                </div>
+                <div id="historialContenido">
+                    <p style="text-align: center; color: #6c757d; padding: 20px;">
+                        <i class="fas fa-info-circle"></i> Seleccione un activo para ver su historial.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-question-circle"></i> Confirmar Actualización</h3>
+            <p>¿Está seguro que desea actualizar el estado del activo seleccionado?</p>
+            <div class="modal-buttons">
+                <button id="cancelBtn" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button id="confirmBtn" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Luz a las Naciones</p>
+    </footer>
+
+    <script>
+        // Función para cargar el historial de un activo
+        function cargarHistorial() {
+            const activoId = document.getElementById('activo_historial').value;
+            const historialDiv = document.getElementById('historialContenido');
+            
+            if (!activoId) {
+                historialDiv.innerHTML = `
+                    <p style="text-align: center; color: #6c757d; padding: 20px;">
+                        <i class="fas fa-info-circle"></i> Seleccione un activo para ver su historial.
+                    </p>
+                `;
+                return;
+            }
+            
+            // Simulación de carga
+            historialDiv.innerHTML = `
+                <p style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando historial...
+                </p>
+            `;
+            
+            // Simular respuesta de servidor con datos de ejemplo
+            setTimeout(() => {
+                const historialEjemplo = generarHistorialEjemplo(activoId);
+                historialDiv.innerHTML = historialEjemplo;
+            }, 1000);
+        }
+
+        // Función para generar historial de ejemplo
+        function generarHistorialEjemplo(activoId) {
+            const historiales = {
+                '1': [
+                    { fecha: '2025-05-25 14:30', tipo: 'modificación', detalles: 'Estado cambiado de "En Mantenimiento" a "Operativo"', sitio: 'Aula 101 → Aula 103' },
+                    { fecha: '2025-05-20 09:15', tipo: 'asignación', detalles: 'Asignado para mantenimiento preventivo', sitio: 'Aula 103 → Almacén' },
+                    { fecha: '2025-05-15 16:45', tipo: 'movimiento', detalles: 'Trasladado por reubicación de equipos', sitio: 'Aula 101 → Aula 103' }
+                ],
+                '2': [
+                    { fecha: '2025-05-28 11:20', tipo: 'modificación', detalles: 'Estado cambiado de "Operativo" a "En Reparación"', sitio: 'Oficina Administrativa' },
+                    { fecha: '2025-05-22 08:30', tipo: 'asignación', detalles: 'Asignado al departamento administrativo', sitio: 'Almacén → Oficina Administrativa' }
+                ],
+                '3': [
+                    { fecha: '2025-05-29 07:45', tipo: 'modificación', detalles: 'Estado cambiado de "Fuera de Servicio" a "Operativo"', sitio: 'Sala de Servidores' },
+                    { fecha: '2025-05-26 13:10', tipo: 'remoción', detalles: 'Retirado por falla en conectividad', sitio: 'Oficina Principal → Sala de Servidores' }
+                ]
+            };
+
+            const historial = historiales[activoId] || [];
+            
+            if (historial.length === 0) {
+                return `
+                    <p style="text-align: center; color: #6c757d; padding: 20px;">
+                        <i class="fas fa-exclamation-circle"></i> No hay historial disponible para este activo.
+                    </p>
+                `;
+            }
+
+            let html = '';
+            historial.forEach(item => {
+                const badgeClass = `badge-${item.tipo === 'modificación' ? 'modify' : 
+                                            item.tipo === 'asignación' ? 'assign' : 
+                                            item.tipo === 'movimiento' ? 'move' : 'remove'}`;
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-date">
+                            <i class="fas fa-calendar-alt"></i> ${item.fecha}
+                        </div>
+                        <div class="history-details">
+                            <span class="badge-status ${badgeClass}">${item.tipo.toUpperCase()}</span>
+                            ${item.detalles}<br>
+                            <small><i class="fas fa-map-marker-alt"></i> ${item.sitio}</small>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        // Función para mostrar el modal de confirmación
+        document.getElementById('updateAssetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const modal = document.getElementById('confirmModal');
+            modal.style.display = 'block';
+        });
+
+        // Función para cerrar el modal y cancelar
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            document.getElementById('confirmModal').style.display = 'none';
+        });
+
+        // Función para confirmar la actualización
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            document.getElementById('confirmModal').style.display = 'none';
+            
+            // Simular envío del formulario
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i> Estado actualizado correctamente y registrado en el historial.
+                </div>
+            `;
+            
+            // Limpiar el formulario
+            document.getElementById('updateAssetForm').reset();
+            
+            // Ocultar mensaje después de 5 segundos
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        });
+
+        // Cerrar modal al hacer clic fuera de él
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('confirmModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
