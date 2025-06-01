@@ -71,6 +71,7 @@ $activos = getActivosFiltrados($conn, $filtros);
 <head>
     <meta charset="UTF-8">
     <title>Reporte de Activos</title>
+    <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {

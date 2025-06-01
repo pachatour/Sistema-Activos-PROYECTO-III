@@ -1,375 +1,172 @@
 <?php
-session_start();
 require_once 'conexion.php';
 
-// Verificar si el usuario está autenticado
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
-}
-
-$usuario_id = $_SESSION['user_id'];
-$prestador = $conn->query("SELECT u.*, tu.nombre as tipo_usuario 
-                          FROM usuarios u
-                          JOIN tipo_usuarios tu ON u.id_tipo_usuario = tu.id
-                          WHERE u.id = $usuario_id")->fetch_assoc();
-
 // Obtener préstamos activos
-$prestamos_activos = $conn->query("SELECT p.*, 
-                                  a.nombre as activo_nombre, 
-                                  a.codigoBarras,
-                                  CONCAT(e.nombre, ' ', e.apellido) as estudiante_nombre,
-                                  u.nombre_usuario as prestador_nombre
-                                  FROM prestamos p
-                                  JOIN activos a ON p.id_activo = a.id
-                                  JOIN estudiantes e ON p.id_estudiante = e.id_estudiante
-                                  JOIN usuarios u ON p.id_prestador = u.id
-                                  WHERE p.estado = 'prestado'");
+$prestamos_activos = $conn->query("
+    SELECT p.*, 
+           a.nombre as activo_nombre, 
+           a.codigoBarras,
+           ub.nombre as usuario_nombre,
+           ub.apellido as usuario_apellido,
+           ub.tipo as tipo_usuario
+    FROM prestamos p
+    JOIN activos a ON p.id_activo = a.id
+    JOIN usuarios_biblioteca ub ON p.id_usuario_biblioteca = ub.id
+    WHERE p.estado = 'prestado'
+");
+
+// Configuración de préstamos
+$config_prestamos = [
+    'estudiante' => ['dias' => 7, 'renovaciones' => 1],
+    'docente' => ['dias' => 15, 'renovaciones' => 2]
+];
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Gestión de Préstamos de Libros</title>
+     <meta charset="UTF-8">
+    <title>Gestión de Préstamos - Biblioteca</title>
+    <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            color: #fff;
-            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar {
-            width: 100%;
-            background-color: rgba(0, 30, 60, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-
-        .navbar h1 {
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-
-        .dashboard {
-            padding: 40px 10px 30px 10px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .stats-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin-bottom: 35px;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            background: rgba(0, 30, 60, 0.9);
-            border-radius: 12px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            padding: 30px 38px;
-            align-items: center;
-            gap: 10px;
-            color: #FFD700;
-            min-width: 180px;
-            text-align: center;
-        }
-        .stat-card h3 {
-            color: #FFD700;
-            margin-bottom: 10px;
-        }
-        .stat-card p {
-            color: #fff;
-            font-size: 2rem;
-            margin: 0;
-        }
-
-        #searchInput {
-            padding: 8px;
-            border-radius: 20px;
-            border: 1px solid #FFD700;
-            outline: none;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            margin-left: 10px;
-        }
-
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: rgba(255,255,255,0.97);
-            margin-top: 10px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            color: #2c3e50;
-        }
-
-        .inventory-table th, .inventory-table td {
-            padding: 12px 15px;
-            text-align: left;
-        }
-
-        .inventory-table thead {
-            background-color: #FFD700;
-            color: #003366;
-        }
-
-        .inventory-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .inventory-table tbody tr:hover {
-            background-color: #ffe033;
-        }
-
-        .form-container {
-            background: rgba(0, 30, 60, 0.9);
-            border-radius: 12px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            padding: 30px 38px;
-            margin-bottom: 30px;
-            color: #fff;
-        }
-
-        .form-group label {
-            color: #FFD700;
-            font-weight: bold;
-        }
-
-        .form-control, select, input[type="text"], input[type="email"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0 16px 0;
-            border-radius: 6px;
-            border: 1px solid #FFD700;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-
-        .btn.btn-primary, button[type="submit"] {
-            background-color: #FFD700;
-            color: #003366;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .btn.btn-primary:hover, button[type="submit"]:hover {
-            background-color: #ffe033;
-            color: #003366;
-        }
-
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .popup-content {
-            background: linear-gradient(rgba(0, 30, 60, 0.95), rgba(0, 20, 50, 0.95));
-            border: 2px solid #FFD700;
-            border-radius: 10px;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            color: #fff;
-        }
-        
-        .close-popup {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: #FFD700;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .close-popup:hover {
-            transform: rotate(90deg);
-        }
-        
-        /* Badge styles */
-        .badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .badge-prestado {
-            background-color: #17a2b8;
-            color: white;
-        }
-        
-        .badge-devuelto {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .badge-atrasado {
-            background-color: #dc3545;
-            color: white;
-        }
-        
-        .badge-alerta {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        @media (max-width: 700px) {
-            .dashboard {
-                padding: 10px 2px;
-            }
-            .stats-container {
-                flex-direction: column;
-                gap: 16px;
-            }
-            .form-container {
-                padding: 18px 8px;
-            }
-            .inventory-table th, .inventory-table td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesara.css">
 </head>
 <body>
-    <nav class="navbar">
-        <h1><i class="fas fa-book"></i> Gestión de Préstamos</h1>
-        <div style="color: #FFD700;">
-            <i class="fas fa-user-shield"></i> <?= htmlspecialchars($prestador['nombre_usuario']) ?> 
-            <small>(<?= htmlspecialchars($prestador['tipo_usuario']) ?>)</small>
+   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+    <div class="container-fluid">
+        <!-- Logo y título -->
+        <a class="navbar-brand" href="prestamos.php">
+            <i class="fas fa-hand-holding me-2"></i>
+            <span class="d-none d-sm-inline">GESTIÓN DE PRESTAMOS</span>
+        </a>
+        
+        <!-- Botón hamburguesa para móviles -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Menú de navegación -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="biblio_dashboard.php">
+                        <i class="fa-brands fa-wpforms"></i> Dashboard
+                    </a>
+                </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link active" href="prestamos.php">
+                        <i class="fas fa-exchange-alt me-1"></i> Préstamos
+                    </a>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link active" href="crud_libros.php">
+                        <i class="fas fa-book me-1"></i> Libros
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="crud_estudiantes.php">
+                        <i class="fas fa-users me-1"></i> Crear Usuarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="reporte_libros.php">
+                        <i class="fas fa-chart-bar me-1"></i> Reportes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger logout-link" href="logout.php">
+                        <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
+                    </a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="dashboard">
         <div class="stats-container">
             <div class="stat-card">
-                <h3><i class="fas fa-book-open"></i> Préstamos Activos</h3>
-                <p><?= $prestamos_activos->num_rows ?></p>
+                <h3><i class="fas fa-book"></i> Préstamos Activos</h3>
+                <p><?php echo $prestamos_activos->num_rows; ?></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-exclamation-triangle"></i> Atrasados</h3>
-                <p>0</p>
+                <h3><i class="fas fa-exclamation-triangle"></i> Préstamos Atrasados</h3>
+                <p><?php 
+                    $atrasados = $conn->query("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'atrasado'")->fetch_assoc();
+                    echo $atrasados['total'];
+                ?></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-check-circle"></i> Completados</h3>
-                <p>0</p>
+                <h3><i class="fas fa-check-circle"></i> Préstamos Completados</h3>
+                <p><?php 
+                    $completados = $conn->query("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'devuelto'")->fetch_assoc();
+                    echo $completados['total'];
+                ?></p>
             </div>
         </div>
+        <!-- [Mismo stats-container que antes] -->
 
         <div class="form-container">
-            <h2 style="color: #FFD700; margin-bottom: 20px;">
-                <i class="fas fa-plus-circle"></i> Registrar Nuevo Préstamo
-            </h2>
-            <form id="formPrestamo" action="registrar_prestamo.php" method="post">
-                <input type="hidden" name="prestador_id" value="<?= $usuario_id ?>">
-                
+            <h2 style="color: #FFD700; margin-bottom: 20px;"><i class="fas fa-plus-circle"></i> Nuevo Préstamo</h2>
+            <form action="registrar_prestamo.php" method="post">
                 <div class="form-group">
-                    <label for="libro"><i class="fas fa-book"></i> Libro:</label>
-                    <select id="libro" name="libro" class="form-control" required>
-                        <option value="">Seleccionar libro...</option>
+                    <label for="activo">Activo:</label>
+                    <select id="activo" name="id_activo" class="form-control" required>
+                        <option value="">Seleccionar activo...</option>
                         <?php
-                        $libros = $conn->query("SELECT a.id, a.nombre, a.codigoBarras 
-                                              FROM activos a
-                                              JOIN categorias c ON a.id_categoria = c.id
-                                              WHERE c.nombre = 'Libro' AND a.id_estado != 6");
-                        while ($libro = $libros->fetch_assoc()):
+                        $activos = $conn->query("SELECT id, nombre, codigoBarras FROM activos 
+                                                WHERE id_categoria = 2 AND id NOT IN (SELECT id_activo FROM prestamos WHERE estado = 'prestado')");
+                        while ($activo = $activos->fetch_assoc()) {
+                            echo "<option value='{$activo['id']}'>{$activo['nombre']} ({$activo['codigoBarras']})</option>";
+                        }
                         ?>
-                        <option value="<?= $libro['id'] ?>">
-                            <?= htmlspecialchars($libro['nombre']) ?> (<?= $libro['codigoBarras'] ?>)
-                        </option>
-                        <?php endwhile; ?>
                     </select>
                 </div>
-                
                 <div class="form-group">
-                    <label for="estudiante"><i class="fas fa-user-graduate"></i> Estudiante:</label>
-                    <div style="display: flex; gap: 10px;">
-                        <select id="estudiante" name="estudiante" class="form-control" required>
-                            <option value="">Seleccionar estudiante...</option>
-                            <?php
-                            $estudiantes = $conn->query("SELECT * FROM estudiantes WHERE activo = 1");
-                            while ($estudiante = $estudiantes->fetch_assoc()):
-                            ?>
-                            <option value="<?= $estudiante['id_estudiante'] ?>">
-                                <?= htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido']) ?> 
-                            </option>
-                            <?php endwhile; ?>
-                        </select>
-                        <button type="button" class="btn btn-primary" onclick="mostrarPopupEstudiante()">
-                            <i class="fas fa-plus"></i> Nuevo
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dias_prestamo"><i class="fas fa-calendar-alt"></i> Duración:</label>
-                    <select id="dias_prestamo" name="dias_prestamo" class="form-control" required>
-                        <option value="7">7 días (Estudiante)</option>
-                        <option value="15">15 días (Docente)</option>
+                    <label for="usuario">Usuario:</label>
+                    <select id="usuario" name="id_usuario_biblioteca" class="form-control" required>
+                        <option value="">Seleccionar usuario...</option>
+                        <?php
+                        // Cargar todos los usuarios activos de la biblioteca
+                        $usuarios = $conn->query("SELECT id, nombre, apellido, tipo FROM usuarios_biblioteca WHERE activo = 1 ORDER BY nombre");
+                        while ($usuario = $usuarios->fetch_assoc()) {
+                            echo "<option value='{$usuario['id']}' data-tipo='{$usuario['tipo']}'>
+                                    {$usuario['nombre']} {$usuario['apellido']} - " . ucfirst($usuario['tipo']) . "
+                                </option>";
+                        }
+                        ?>
                     </select>
+                    <input type="hidden" id="tipo_usuario" name="tipo_usuario" value="">
                 </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Registrar Préstamo
-                </button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Registrar Préstamo</button>
             </form>
         </div>
 
-        <!-- Listado de préstamos activos -->
-        <h2 style="color: #FFD700; margin: 30px 0 20px 0;">
-            <i class="fas fa-list"></i> Préstamos Activos
-        </h2>
-        
-        <div class="search-filter" style="margin-bottom: 15px;">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Buscar préstamo...">
-        </div>
-        
+        <script>
+        // Actualizar el campo oculto tipo_usuario cuando se selecciona un usuario
+        document.getElementById('usuario').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('tipo_usuario').value = selectedOption.dataset.tipo;
+            } else {
+                document.getElementById('tipo_usuario').value = '';
+            }
+        });
+        </script>
+
+        <h2 style="color: #FFD700; margin: 30px 0 20px 0;"><i class="fas fa-list"></i> Préstamos Activos</h2>
         <table class="inventory-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Libro</th>
+                    <th>Activo</th>
                     <th>Código</th>
-                    <th>Estudiante</th>
+                    <th>Usuario</th>
+                    <th>Tipo</th>
                     <th>Fecha Préstamo</th>
-                    <th>Devolución</th>
+                    <th>Devolución Esperada</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -378,37 +175,35 @@ $prestamos_activos = $conn->query("SELECT p.*,
                 <?php while ($prestamo = $prestamos_activos->fetch_assoc()): 
                     $fecha_devolucion = new DateTime($prestamo['fecha_devolucion_esperada']);
                     $hoy = new DateTime();
-                    $estado = $prestamo['estado'];
-                    $badge_class = 'badge-prestado';
+                    $estado_clase = 'status-prestado';
+                    $estado_texto = 'Prestado';
                     
-                    if ($hoy > $fecha_devolucion && $estado == 'prestado') {
-                        $badge_class = 'badge-atrasado';
-                        $estado = 'Atrasado';
-                    } elseif ($hoy->diff($fecha_devolucion)->days <= 1 && $estado == 'prestado') {
-                        $badge_class = 'badge-alerta';
-                        $estado = 'Por vencer';
-                    } else {
-                        $estado = ucfirst($estado);
+                    if ($hoy > $fecha_devolucion) {
+                        $estado_clase = 'status-atrasado';
+                        $estado_texto = 'Atrasado';
+                    } elseif ($hoy->diff($fecha_devolucion)->days <= 1) {
+                        $estado_clase = 'status-alerta';
+                        $estado_texto = 'Por vencer';
                     }
                 ?>
                 <tr>
                     <td><?= $prestamo['id'] ?></td>
                     <td><?= htmlspecialchars($prestamo['activo_nombre']) ?></td>
                     <td><?= htmlspecialchars($prestamo['codigoBarras']) ?></td>
-                    <td>
-                        <?= htmlspecialchars($prestamo['estudiante_nombre']) ?>
-                    </td>
+                    <td><?= htmlspecialchars($prestamo['usuario_nombre'].' '.$prestamo['usuario_apellido']) ?></td>
+                    <td><?= ucfirst($prestamo['tipo_usuario']) ?></td>
                     <td><?= date('d/m/Y', strtotime($prestamo['fecha_prestamo'])) ?></td>
                     <td><?= date('d/m/Y', strtotime($prestamo['fecha_devolucion_esperada'])) ?></td>
-                    <td><span class="badge <?= $badge_class ?>"><?= $estado ?></span></td>
+                    <td><span class="status-badge <?= $estado_clase ?>"><?= $estado_texto ?></span></td>
                     <td>
-                        <button class="action-btn" title="Devolver" 
-                                onclick="devolverPrestamo(<?= $prestamo['id'] ?>)">
+                        <button class="action-btn" title="Devolver" onclick="devolverPrestamo(<?= $prestamo['id'] ?>)">
                             <i class="fas fa-undo"></i>
                         </button>
-                        <button class="action-btn" title="Notificar" 
-                                onclick="notificarUsuario(<?= $prestamo['id'] ?>)">
+                        <button class="action-btn" title="Notificar" onclick="notificarUsuario(<?= $prestamo['id'] ?>)">
                             <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="action-btn" title="Renovar" onclick="renovarPrestamo(<?= $prestamo['id'] ?>, '<?= $prestamo['tipo_usuario'] ?>')">
+                            <i class="fas fa-sync-alt"></i>
                         </button>
                     </td>
                 </tr>
@@ -418,112 +213,222 @@ $prestamos_activos = $conn->query("SELECT p.*,
     </div>
 
     <script>
-        // Mostrar/ocultar popup estudiante
-        function mostrarPopupEstudiante() {
-            document.getElementById('popupEstudiante').style.display = 'flex';
-        }
-        
-        function cerrarPopupEstudiante() {
-            document.getElementById('popupEstudiante').style.display = 'none';
-        }
-        
-        // Registrar nuevo estudiante via AJAX
-        function registrarEstudiante() {
-            const nombre = document.getElementById('nombre').value;
-            const apellido = document.getElementById('apellido').value;
-            const codigo = document.getElementById('codigo').value;
-            const email = document.getElementById('email').value;
-            const nivel = document.getElementById('nivel').value;
-            const curso = document.getElementById('curso').value;
-            const paralelo = document.getElementById('paralelo').value;
+        // Cargar usuarios según tipo seleccionado
+        document.getElementById('tipo_usuario').addEventListener('change', function() {
+            const tipo = this.value;
+            const usuarioSelect = document.getElementById('usuario');
             
-            if (!nombre || !apellido || !codigo) {
-                alert('Por favor complete los campos obligatorios');
+            if (!tipo) {
+                usuarioSelect.innerHTML = '<option value="">Seleccione tipo primero</option>';
                 return;
             }
             
-            fetch('registrar_estudiante.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `nombre=${encodeURIComponent(nombre)}&apellido=${encodeURIComponent(apellido)}&codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}&nivel=${nivel}&curso=${curso}&paralelo=${paralelo}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Agregar el nuevo estudiante al select
-                    const select = document.getElementById('estudiante');
-                    const option = document.createElement('option');
-                    option.value = data.id;
-                    option.text = `${nombre} ${apellido} (${codigo})`;
-                    select.add(option);
-                    select.value = data.id;
-                    
-                    // Cerrar popup y limpiar formulario
-                    cerrarPopupEstudiante();
-                    document.getElementById('formEstudiante').reset();
-                    
-                    alert('Estudiante registrado con éxito');
-                } else {
-                    alert('Error: ' + (data.message || 'No se pudo registrar el estudiante'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al registrar estudiante');
-            });
-        }
-        
-        // Devolver préstamo
-        function devolverPrestamo(id) {
+            fetch(`get_usuarios_biblioteca.php?tipo=${tipo}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">Seleccionar usuario...</option>';
+                    data.forEach(usuario => {
+                        options += `<option value="${usuario.id}">${usuario.nombre} ${usuario.apellido}</option>`;
+                    });
+                    usuarioSelect.innerHTML = options;
+                });
+        });
+
+       function devolverPrestamo(id) {
             if (confirm('¿Está seguro de marcar este préstamo como devuelto?')) {
                 window.location.href = 'devolver_prestamo.php?id=' + id;
             }
         }
-        
-        // Notificar usuario
+
         function notificarUsuario(id) {
-            fetch('notificar_prestamo.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `id_prestamo=${id}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Notificación enviada al estudiante');
-                } else {
-                    alert('Error al enviar notificación: ' + (data.message || ''));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al enviar notificación');
-            });
+            alert('Notificación enviada al usuario sobre el préstamo #' + id);
+            // En una implementación real, aquí iría una llamada AJAX
         }
-        
-        // Búsqueda en tiempo real
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchValue = this.value.toLowerCase();
-            const rows = document.querySelectorAll('.inventory-table tbody tr');
-            
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                let found = false;
-                
-                for (let i = 0; i < cells.length - 1; i++) {
-                    if (cells[i].textContent.toLowerCase().includes(searchValue)) {
-                        found = true;
-                        break;
+
+        function renovarPrestamo(id, tipoUsuario) {
+            if (confirm(`¿Desea renovar este préstamo por ${tipoUsuario === 'estudiante' ? '7' : '15'} días más?`)) {
+                window.location.href = 'renovar_prestamo.php?id=' + id;
+            }
+        }
+        // logout.js - Para confirmar antes de cerrar sesión
+        document.querySelectorAll('.logout-link').forEach(link => {link.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+            window.location.href = this.href;
+        }
+    });
+});
+    </script>
+    
+</body>
+</html>
+<?php
+$conn->close();
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+   
+</head>
+<body>
+    
+
+    <div class="dashboard">
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3><i class="fas fa-book"></i> Préstamos Activos</h3>
+                <p><?php echo $prestamos_activos->num_rows; ?></p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Préstamos Atrasados</h3>
+                <p><?php 
+                    $atrasados = $conn->query("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'atrasado'")->fetch_assoc();
+                    echo $atrasados['total'];
+                ?></p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-check-circle"></i> Préstamos Completados</h3>
+                <p><?php 
+                    $completados = $conn->query("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'devuelto'")->fetch_assoc();
+                    echo $completados['total'];
+                ?></p>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <h2 style="color: #FFD700; margin-bottom: 20px;"><i class="fas fa-plus-circle"></i> Nuevo Préstamo</h2>
+            <form action="registrar_prestamo.php" method="post">
+                <div class="form-group">
+                    <label for="activo">Activo:</label>
+                    <select id="activo" name="id_activo" class="form-control" required>
+                        <option value="">Seleccionar activo...</option>
+                        <?php
+                        $activos = $conn->query("SELECT id, nombre, codigoBarras FROM activos WHERE id NOT IN (SELECT id_activo FROM prestamos WHERE estado = 'prestado')");
+                        while ($activo = $activos->fetch_assoc()) {
+                            echo "<option value='{$activo['id']}'>{$activo['nombre']} ({$activo['codigoBarras']})</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tipo_usuario">Tipo de Usuario:</label>
+                    <select id="tipo_usuario" name="tipo_usuario" class="form-control" required>
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="estudiante">Estudiante</option>
+                        <option value="docente">Docente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="usuario">Usuario:</label>
+                    <select id="usuario" name="id_usuario" class="form-control" required>
+                        <option value="">Seleccionar usuario...</option>
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Registrar Préstamo</button>
+            </form>
+        </div>
+
+        <h2 style="color: #FFD700; margin: 30px 0 20px 0;"><i class="fas fa-list"></i> Préstamos Activos</h2>
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Activo</th>
+                    <th>Código</th>
+                    <th>Usuario</th>
+                    <th>Tipo</th>
+                    <th>Fecha Préstamo</th>
+                    <th>Devolución Esperada</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($prestamo = $prestamos_activos->fetch_assoc()): 
+                    $fecha_devolucion = new DateTime($prestamo['fecha_devolucion_esperada']);
+                    $hoy = new DateTime();
+                    $diferencia = $hoy->diff($fecha_devolucion);
+                    $dias_restantes = $diferencia->days;
+                    $estado_clase = 'status-prestado';
+                    $estado_texto = 'Prestado';
+                    
+                    if ($hoy > $fecha_devolucion) {
+                        $estado_clase = 'status-atrasado';
+                        $estado_texto = 'Atrasado';
+                    } elseif ($dias_restantes <= 1) {
+                        $estado_clase = 'status-alerta';
+                        $estado_texto = 'Por vencer';
                     }
-                }
-                
-                row.style.display = found ? '' : 'none';
-            });
+                    
+                    $nombre_completo = trim($prestamo['nombre_completo'] . ' ' . $prestamo['apellido_completo']);
+                ?>
+                <tr>
+                    <td><?php echo $prestamo['id']; ?></td>
+                    <td><?php echo htmlspecialchars($prestamo['activo_nombre']); ?></td>
+                    <td><?php echo htmlspecialchars($prestamo['codigoBarras']); ?></td>
+                    <td><?php echo htmlspecialchars($nombre_completo ?: $prestamo['usuario_nombre']); ?></td>
+                    <td><?php echo ucfirst($prestamo['tipo_usuario']); ?></td>
+                    <td><?php echo date('d/m/Y', strtotime($prestamo['fecha_prestamo'])); ?></td>
+                    <td><?php echo date('d/m/Y', strtotime($prestamo['fecha_devolucion_esperada'])); ?></td>
+                    <td><span class="status-badge <?php echo $estado_clase; ?>"><?php echo $estado_texto; ?></span></td>
+                    <td>
+                        <button class="action-btn" title="Devolver" onclick="devolverPrestamo(<?php echo $prestamo['id']; ?>)">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="action-btn" title="Notificar" onclick="notificarUsuario(<?php echo $prestamo['id']; ?>)">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="action-btn" title="Renovar" onclick="renovarPrestamo(<?php echo $prestamo['id']; ?>, '<?php echo $prestamo['tipo_usuario']; ?>')">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Cargar usuarios según tipo seleccionado
+        document.getElementById('tipo_usuario').addEventListener('change', function() {
+            const tipoUsuario = this.value;
+            const usuarioSelect = document.getElementById('usuario');
+            
+            if (!tipoUsuario) {
+                usuarioSelect.innerHTML = '<option value="">Seleccionar usuario...</option>';
+                return;
+            }
+            
+            fetch(`get_usuarios.php?tipo=${tipoUsuario}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">Seleccionar usuario...</option>';
+                    data.forEach(usuario => {
+                        options += `<option value="${usuario.id}">${usuario.nombre}</option>`;
+                    });
+                    usuarioSelect.innerHTML = options;
+                });
         });
+
+        
     </script>
 </body>
 </html>
