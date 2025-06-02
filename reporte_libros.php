@@ -44,7 +44,117 @@ while ($row = $grafico_estados->fetch_assoc()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="stylesara.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+        .navbar {
+            width: 100%;
+            background-color: rgba(0, 30, 60, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        .dashboard {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .table-responsive {
+            background: rgba(0, 30, 60, 0.93);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(0, 30, 60, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .inventory-table th {
+            background-color: #FFD700;
+            color: #00264d;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        .inventory-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .inventory-table tr:last-child td {
+            border-bottom: none;
+        }
+        .inventory-table tr:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status-prestado { background-color: #28a745; }
+        .status-devuelto { background-color: #17a2b8; }
+        .status-atrasado { background-color: #dc3545; }
+        .status-disponible { background-color: #6c757d; }
+        .status-alerta { background-color: #ffc107; color: #000; }
+        .obs-cell { max-width: 250px; white-space: pre-line; word-break: break-word; }
+        .charts-row {
+            display: flex;
+            gap: 30px;
+            margin: 40px 0 0 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .chart-card {
+            background: rgba(0, 30, 60, 0.93);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            padding: 24px 20px 16px 20px;
+            min-width: 320px;
+            max-width: 420px;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-card h3 {
+            color: #FFD700;
+            font-size: 1.1em;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .dashboard { padding: 10px; }
+            .table-responsive { padding: 5px; }
+            .inventory-table th, .inventory-table td { padding: 8px 6px; }
+            .charts-row { flex-direction: column; gap: 18px; }
+            .chart-card { min-width: 0; max-width: 100%; }
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">

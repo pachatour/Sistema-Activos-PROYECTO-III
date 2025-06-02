@@ -241,8 +241,25 @@ $config_prestamos = [
         }
 
         function notificarUsuario(id) {
-            alert('Notificación enviada al usuario sobre el préstamo #' + id);
-            // En una implementación real, aquí iría una llamada AJAX
+            // Llama a notificar_prestamo.php por AJAX para enviar el correo
+            fetch('notificar_prestamo.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id_prestamo=' + encodeURIComponent(id)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Notificación enviada al usuario por correo.');
+                } else {
+                    alert('No se pudo enviar la notificación: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                alert('Error al enviar la notificación.');
+            });
         }
 
         function renovarPrestamo(id, tipoUsuario) {

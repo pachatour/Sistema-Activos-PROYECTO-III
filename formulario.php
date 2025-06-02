@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background-color: rgba(0, 30, 60, 0.92);
       border-radius: 18px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      max-width: 700px; /* Aumenta el ancho máximo */
+      max-width: 900px; /* Aumenta el ancho máximo */
       margin: 40px auto;
       padding: 40px 32px 32px 32px;
       border: 2px solid #FFD700;
@@ -271,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     @media (max-width: 600px) {
       .form-container {
         padding: 20px 8px 18px 8px;
-        max-width: 98vw;
+        max-width: 128vw;
       }
       h1 {
         font-size: 1.1rem;
@@ -281,7 +281,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
   <nav class="navbar">
-    <h1><i class="fas fa-boxes"></i> Registro de Activo Fijo</h1>
+    <h1><i class="fas fa-boxes"></i> REGISTRO DE ACTIVOS</h1>
   </nav>
   <div class="form-container">
     <form method="POST" id="formularioActivo" onsubmit="return validarFormulario()">
