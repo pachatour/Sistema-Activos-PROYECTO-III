@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+include 'conexion.php';
 header('Content-Type: application/json');
 
 $response = ['success' => false, 'message' => ''];

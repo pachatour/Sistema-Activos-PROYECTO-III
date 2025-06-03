@@ -37,6 +37,12 @@ while ($row = $sitios_result->fetch_assoc()) {
     <meta charset="UTF-8">
     <title>Inventario de Activos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg" href="img/gear-fill.svg">
+    <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -265,30 +271,59 @@ while ($row = $sitios_result->fetch_assoc()) {
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <h1><i class="fas fa-boxes"></i> Sistema de Gestión de Inventario</h1>
-    </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="prestamos.php">
+            <i class="fas fa-boxes"></i> 
+            <span class="d-none d-sm-inline">Sistema de Gestión de Inventario</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                    <!--<li class="nav-item">
+                        <a class="nav-link active" href="inventario.php">
+                            <i class="fa-brands fa-wpforms"></i> Inventario
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a class="nav-link active" href="estado_activos.php">
+                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="historiales.php">
+                            <i class="fas fa-users me-1"></i> Historiales
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="formulario.php">
+                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="reporte_graficos.php">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="reportes.php">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger logout-link" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
+                        </a>
+                    </li>
+                </ul>
+        </div>
+    </div>
+</nav>
+
 
    <div class="dashboard">
-         <!--<div class="stats-container">
-            <div class="stat-card">
-                <h3><i class="fas fa-box-open"></i> Total de Activos</h3>
-                <p><?php echo $total_activos; ?></p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-check-circle"></i> Activos Operativos</h3>
-                <p><?php echo $activos_operativos; ?></p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-exclamation-triangle"></i> Reportes</h3>
-                <p><?php echo $total_reportes; ?></p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-tools"></i> En Reparación</h3>
-                <p><?php echo $en_reparacion; ?></p>
-            </div>
-        </div>-->
-
         <div class="inventory-header">
             <div class="filter-buttons">
                 <button class="filter-btn active">Todos</button>

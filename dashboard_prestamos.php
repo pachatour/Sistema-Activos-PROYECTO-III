@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+include 'conexion.php';
 
 // Obtener préstamos activos
 $prestamos_activos = $conn->query("
@@ -29,7 +29,7 @@ $prestamos_activos = $conn->query("
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
         <!-- Logo y título -->
-        <a class="navbar-brand" href="prestamos.php">
+        <a class="navbar-brand" href="dashboard_prestamos.php">
             <i class="fas fa-hand-holding me-2"></i>
             <span class="d-none d-sm-inline">GESTIÓN DE PRESTAMOS</span>
         </a>
@@ -139,16 +139,26 @@ function notificarUsuario(id) {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'id_prestamo=' + encodeURIComponent(id)
     })
-    .then(response => response.json())
+    .then(response => {
+        // Verifica si la respuesta es JSON antes de intentar parsear
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                alert('Respuesta inesperada del servidor:\n' + text);
+                throw e;
+            }
+        });
+    })
     .then(data => {
-        if (data.success) {
-            alert('Notificación enviada al usuario por WhatsApp.');
-        } else {
-            alert('No se pudo enviar la notificación: ' + (data.message || 'Error desconocido'));
+        if (data && data.success) {
+            alert(data.message || 'Notificación enviada correctamente.');
+        } else if (data && data.message) {
+            alert('No se pudo enviar la notificación: ' + data.message);
         }
     })
     .catch(error => {
-        alert('Error al enviar la notificación.');
+        alert('Error al enviar la notificación: ' + error);
     });
 }
 function renovarPrestamo(id, tipoUsuario) {

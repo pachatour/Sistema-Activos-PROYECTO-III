@@ -1,8 +1,4 @@
 <?php
-// Archivo historial_activo.php
-// Este archivo procesa la solicitud AJAX para mostrar el historial de un activo
-
-// Verificar que se recibió un ID
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     echo "<p>ID de activo no proporcionado.</p>";
     exit;

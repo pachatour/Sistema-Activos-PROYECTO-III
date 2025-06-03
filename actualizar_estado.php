@@ -1,14 +1,10 @@
 <?php
-// Archivo actualizar_estado.php
-// Este archivo procesa el formulario para actualizar el estado de un activo
 
-// Verificar que se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     header("Location: dashboard_admin.html.php");
     exit;
 }
 
-// Verificar que se recibieron todos los datos necesarios
 if (!isset($_POST['activo_id']) || !isset($_POST['nuevo_estado']) || !isset($_POST['sitio_destino'])) {
     echo "Error: Datos incompletos";
     exit;

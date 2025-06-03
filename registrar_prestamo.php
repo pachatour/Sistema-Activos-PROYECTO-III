@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+include 'conexion.php';
 
 // Obtener datos del formulario
 $id_activo = $_POST['id_activo'];
@@ -38,7 +38,8 @@ $stmt->bind_param("iisss", $id_activo, $id_usuario_biblioteca, $tipo_usuario, $f
 if ($stmt->execute()) {
     header("Location: prestamos.php?success=1");
 } else {
-    header("Location: prestamos.php?error=1");
+    // Mostrar error detallado para depuración
+    die("Error al registrar el préstamo: " . $stmt->error);
 }
 
 $stmt->close();

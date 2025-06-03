@@ -73,6 +73,12 @@ $activos = getActivosFiltrados($conn, $filtros);
     <title>Reporte de Activos</title>
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg" href="img/gear-fill.svg">
+    <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -296,13 +302,56 @@ $activos = getActivosFiltrados($conn, $filtros);
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <h1><i class="fas fa-clipboard-list"></i> Reporte de Activos</h1>
-        <a href="dashboard_admin.html" style="color:#FFD700;text-decoration:none;font-weight:bold;">
-            <i class="fas fa-arrow-left"></i> Volver
-        </a>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="crud_libros.php">
+                <i class="fas fa-clipboard-list" style='font-size:24px'></i>
+                <span class="d-none d-sm-inline">REPORTE DE ACTIVOS</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="inventario.php">
+                            <i class="fa-brands fa-wpforms"></i> Inventario
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="estado_activos.php">
+                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="historiales.php">
+                            <i class="fas fa-users me-1"></i> Historiales
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="formulario.php">
+                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="reporte_graficos.php">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                        </a>
+                    </li>
+                    <!--<li class="nav-item">
+                        <a class="nav-link active" href="reportes.php">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes
+                        </a>
+                    </li>-->
+                    <li class="nav-item">
+                        <a class="nav-link text-danger logout-link" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
-
     <div class="dashboard">
         <div class="form-container">
             <form method="post">

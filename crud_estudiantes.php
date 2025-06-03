@@ -10,10 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
     $nivel = $conn->real_escape_string($_POST['nivel'] ?? '');
     $curso = $conn->real_escape_string($_POST['curso'] ?? '');
     $paralelo = $conn->real_escape_string($_POST['paralelo'] ?? '');
+    $email = $conn->real_escape_string($_POST['email'] ?? '');
+    $telefono = $conn->real_escape_string($_POST['telefono'] ?? '');
 
     if ($_POST['accion'] === 'agregar') {
-        $query = "INSERT INTO usuarios_biblioteca (nombre, apellido, identificacion, nivel, curso, paralelo, tipo)
-                  VALUES ('$nombre', '$apellido', '$identificacion', '$nivel', '$curso', '$paralelo', '$tipo')";
+        $query = "INSERT INTO usuarios_biblioteca (nombre, apellido, identificacion, nivel, curso, paralelo, tipo, email, telefono)
+                  VALUES ('$nombre', '$apellido', '$identificacion', '$nivel', '$curso', '$paralelo', '$tipo', '$email', '$telefono')";
         $conn->query($query);
     } elseif ($_POST['accion'] === 'editar') {
         $id = intval($_POST['id']);
@@ -24,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                     nivel='$nivel',
                     curso='$curso',
                     paralelo='$paralelo',
-                    tipo='$tipo'
+                    tipo='$tipo',
+                    email='$email',
+                    telefono='$telefono'
                   WHERE id=$id";
         $conn->query($query);
     }
@@ -152,6 +156,11 @@ if (isset($_GET['editar'])) {
         </div>
 
         <div class="col-md-6">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" name="email" class="form-control" value="<?= $editando ? ($usuario_edit['email'] ?? '') : '' ?>">
+        </div>
+
+        <div class="col-md-6">
             <label class="form-label">Teléfono</label>
             <input type="text" name="telefono" class="form-control" value="<?= $editando ? ($usuario_edit['telefono'] ?? '') : '' ?>">
         </div>
@@ -206,6 +215,7 @@ if (isset($_GET['editar'])) {
                     <th>Identificación</th>
                     <th>Nombre</th>
                     <th>Tipo</th>
+                    <th>Correo</th>
                     <th>Teléfono</th>
                     <th>Curso</th>
                     <th>Paralelo</th>
@@ -219,6 +229,7 @@ if (isset($_GET['editar'])) {
                     <td><?= $u['identificacion'] ?></td>
                     <td><?= $u['nombre'] . ' ' . $u['apellido'] ?></td>
                     <td><?= ucfirst($u['tipo']) ?></td>
+                    <td><?= $u['email'] ?? '-' ?></td>
                     <td><?= $u['telefono'] ?? '-' ?></td>
                     <td><?= $u['curso'] ?? '-' ?></td>
                     <td><?= $u['paralelo'] ?? '-' ?></td>

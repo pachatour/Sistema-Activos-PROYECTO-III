@@ -26,6 +26,7 @@ function enviarNotificacion($email, $mensaje) {
     // En producción usarías mail() o una librería de correo
     error_log("Notificación a $email: $mensaje");
     return true;
+    
 }
 
 // Notificar préstamos por vencer
