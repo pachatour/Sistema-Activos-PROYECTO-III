@@ -282,11 +282,11 @@ while ($row = $sitios_result->fetch_assoc()) {
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                    <!--<li class="nav-item">
-                        <a class="nav-link active" href="inventario.php">
-                            <i class="fa-brands fa-wpforms"></i> Inventario
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard_admin.html">
+                            <i class='fas fa-home' ></i> Inicio
                         </a>
-                    </li>-->
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
                             <i class="fas fa-exchange-alt me-1"></i> Estado

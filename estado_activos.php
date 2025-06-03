@@ -245,6 +245,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                      <li class="nav-item">
+                        <a class="nav-link active" href="dashboard_admin.html">
+                            <i class='fas fa-home' ></i> Inicio
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="inventario.php">
                             <i class="fa-brands fa-wpforms"></i> Inventario
