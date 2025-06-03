@@ -1,105 +1,105 @@
-
 <?php
-require 'vendor/autoload.php'; // Asegúrate de instalar Dompdf con Composer
-
-use Dompdf\Dompdf;
-use Dompdf\Options;
-
-// Conexión
+require('fpdf/fpdf.php');
 include 'conexion.php';
 
-// Filtros
+// Obtener filtros de la URL (GET)
 $filtros = [
     'categoria' => $_GET['categoria'] ?? '',
     'estado' => $_GET['estado'] ?? '',
     'sitio' => $_GET['sitio'] ?? ''
 ];
 
-// Consulta de activos con historial
-$sql = "SELECT a.id, a.nombre, a.codigoBarras, c.nombre AS categoria, e.nombre AS estado,
-               s.nombre AS sitio, a.cantidad
-        FROM activos a
-        INNER JOIN categorias c ON a.id_categoria = c.id
-        INNER JOIN estado_activos e ON a.id_estado = e.id
-        INNER JOIN sitios s ON a.id_sitio = s.id
-        WHERE 1=1";
+// Función para obtener activos filtrados (igual que en tu código)
+function getActivosFiltrados($conn, $filtros) {
+    $sql = "SELECT a.id, a.nombre, a.codigoBarras, c.nombre AS categoria, e.nombre AS estado,
+                   s.nombre AS sitio, a.cantidad, r.descripcion AS reporte
+            FROM activos a
+            INNER JOIN categorias c ON a.id_categoria = c.id
+            INNER JOIN estado_activos e ON a.id_estado = e.id
+            INNER JOIN sitios s ON a.id_sitio = s.id
+            LEFT JOIN (
+                SELECT id_activo, MAX(fecha_generacion) AS ultima_fecha, descripcion
+                FROM reportes GROUP BY id_activo
+            ) r ON a.id = r.id_activo
+            WHERE 1=1";
 
-$params = [];
-if (!empty($filtros['categoria'])) {
-    $sql .= " AND a.id_categoria = ?";
-    $params[] = $filtros['categoria'];
-}
-if (!empty($filtros['estado'])) {
-    $sql .= " AND a.id_estado = ?";
-    $params[] = $filtros['estado'];
-}
-if (!empty($filtros['sitio'])) {
-    $sql .= " AND a.id_sitio = ?";
-    $params[] = $filtros['sitio'];
-}
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $params = [];
+    if (!empty($filtros['categoria'])) {
+        $sql .= " AND a.id_categoria = ?";
+        $params[] = $filtros['categoria'];
+    }
+    if (!empty($filtros['estado'])) {
+        $sql .= " AND a.id_estado = ?";
+        $params[] = $filtros['estado'];
+    }
+    if (!empty($filtros['sitio'])) {
+        $sql .= " AND a.id_sitio = ?";
+        $params[] = $filtros['sitio'];
+    }
 
-// HTML base
-$html = "<h2>Reporte de Activos</h2>";
-foreach ($activos as $a) {
-    $html .= "<hr><strong>ID:</strong> {$a['id']}
-
-              <strong>Nombre:</strong> {$a['nombre']}
-
-              <strong>Código:</strong> {$a['codigoBarras']}
-
-              <strong>Categoría:</strong> {$a['categoria']}
-
-              <strong>Estado:</strong> {$a['estado']}
-
-              <strong>Ubicación:</strong> {$a['sitio']}
-
-              <strong>Cantidad:</strong> {$a['cantidad']}
-";
-
-    // Historial del activo
-    $hist = $pdo->prepare("SELECT h.fecha_movimiento, h.tipo_movimiento, s1.nombre AS origen, 
-                                  s2.nombre AS destino, u.nombre_usuario, h.observaciones
-                           FROM historial_activos h
-                           LEFT JOIN sitios s1 ON h.id_sitio_origen = s1.id
-                           INNER JOIN sitios s2 ON h.id_sitio_destino = s2.id
-                           INNER JOIN usuarios u ON h.id_usuario = u.id
-                           WHERE h.id_activo = ?
-                           ORDER BY h.fecha_movimiento DESC");
-    $hist->execute([$a['id']]);
-    $movimientos = $hist->fetchAll(PDO::FETCH_ASSOC);
-
-    if ($movimientos) {
-        $html .= "<table border='1' cellspacing='0' cellpadding='5' style='width:100%; margin-top:10px'>
-                    <tr>
-                        <th>Fecha</th><th>Movimiento</th><th>Origen</th><th>Destino</th><th>Usuario</th><th>Obs.</th>
-                    </tr>";
-        foreach ($movimientos as $m) {
-            $html .= "<tr>
-                        <td>{$m['fecha_movimiento']}</td>
-                        <td>{$m['tipo_movimiento']}</td>
-                        <td>{$m['origen']}</td>
-                        <td>{$m['destino']}</td>
-                        <td>{$m['nombre_usuario']}</td>
-                        <td>{$m['observaciones']}</td>
-                    </tr>";
-        }
-        $html .= "</table>";
+    if ($params) {
+        $stmt = $conn->prepare($sql);
+        $types = str_repeat('i', count($params));
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        $result = $stmt->get_result();
     } else {
-        $html .= "<em>Sin historial registrado.</em>";
+        $result = $conn->query($sql);
+    }
+
+    $activos = [];
+    while ($row = $result->fetch_assoc()) {
+        $activos[] = $row;
+    }
+    return $activos;
+}
+
+$activos = getActivosFiltrados($conn, $filtros);
+
+// Crear PDF
+class PDF extends FPDF {
+    function Header() {
+        $this->SetFont('Arial','B',14);
+        $this->Cell(0,10,'Reporte de Activos',0,1,'C');
+        $this->SetFont('Arial','B',10);
+        $this->SetFillColor(255, 215, 0);
+        $this->Cell(10,8,'ID',1,0,'C',true);
+        $this->Cell(40,8,'Nombre',1,0,'C',true);
+        $this->Cell(25,8,'Código',1,0,'C',true);
+        $this->Cell(30,8,'Categoría',1,0,'C',true);
+        $this->Cell(25,8,'Estado',1,0,'C',true);
+        $this->Cell(30,8,'Ubicación',1,0,'C',true);
+        $this->Cell(15,8,'Cantidad',1,0,'C',true);
+        $this->Cell(50,8,'Último Reporte',1,1,'C',true);
+    }
+
+    function Footer() {
+        $this->SetY(-15);
+        $this->SetFont('Arial','I',8);
+        $this->Cell(0,10,'Página '.$this->PageNo().'/{nb}',0,0,'C');
     }
 }
 
-// Generar PDF
-$options = new Options();
-$options->set('defaultFont', 'Arial');
-$dompdf = new Dompdf($options);
-$dompdf->loadHtml($html);
-$dompdf->setPaper('A4', 'portrait');
-$dompdf->render();
-$dompdf->stream("reporte_activos.pdf", ["Attachment" => true]);
-exit;
+$pdf = new PDF();
+$pdf->AliasNbPages();
+$pdf->AddPage();
+$pdf->SetFont('Arial','',10);
+
+if (count($activos) === 0) {
+    $pdf->Cell(0,10,'No se encontraron activos con los filtros aplicados.',0,1,'C');
+} else {
+    foreach ($activos as $a) {
+        $pdf->Cell(10,8,$a['id'],1);
+        $pdf->Cell(40,8,utf8_decode($a['nombre']),1);
+        $pdf->Cell(25,8,utf8_decode($a['codigoBarras']),1);
+        $pdf->Cell(30,8,utf8_decode($a['categoria']),1);
+        $pdf->Cell(25,8,utf8_decode($a['estado']),1);
+        $pdf->Cell(30,8,utf8_decode($a['sitio']),1);
+        $pdf->Cell(15,8,$a['cantidad'],1,0,'C');
+        $pdf->Cell(50,8,utf8_decode($a['reporte'] ?: 'Sin reportes'),1,1);
+    }
+}
+
+$pdf->Output('I', 'reporte_activos.pdf');
+$conn->close();
 ?>
- 

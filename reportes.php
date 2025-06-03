@@ -143,7 +143,7 @@ $activos = getActivosFiltrados($conn, $filtros);
         .form-select {
             width: 100%;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(7, 12, 77, 0.68);
             border: 1px solid #FFD700;
             border-radius: 6px;
             color: white;
@@ -298,7 +298,7 @@ $activos = getActivosFiltrados($conn, $filtros);
 <body>
     <nav class="navbar">
         <h1><i class="fas fa-clipboard-list"></i> Reporte de Activos</h1>
-        <a href="biblio_dashboard.php" style="color:#FFD700;text-decoration:none;font-weight:bold;">
+        <a href="dashboard_admin.html" style="color:#FFD700;text-decoration:none;font-weight:bold;">
             <i class="fas fa-arrow-left"></i> Volver
         </a>
     </nav>

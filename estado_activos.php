@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Historiales - Administración de Activos</title>
+    <title>Actualizar Estado - Administración de Activos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -139,58 +139,6 @@
             background-color: #5a6268;
         }
 
-        .history-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            border-left: 4px solid #FFD700;
-            margin-bottom: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-date {
-            color: #6c757d;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-
-        .history-details {
-            margin-top: 8px;
-            color: #333;
-        }
-
-        .badge-status {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .badge-move {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .badge-assign {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-modify {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .badge-remove {
-            background-color: #dc3545;
-            color: white;
-        }
-
         /* Estilos para el modal de confirmación */
         .modal {
             display: none;
@@ -247,15 +195,6 @@
             margin-top: 10px;
         }
 
-        #historialContenido {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 10px;
-            background-color: #f8f9fa;
-        }
-
         footer {
             text-align: center;
             color: rgba(255, 255, 255, 0.8);
@@ -291,49 +230,77 @@
 <body>
     <div class="navbar">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMLf1emihqA5SgR4Eo9cdwbQdNxLRLcEOg5g&s" alt="Logo Univalle">
-        <h1>HISTORIALES - ADMINISTRACIÓN DE ACTIVOS</h1>
+        <h1>ACTUALIZAR ESTADO DE ACTIVOS</h1>
     </div>
 
     <div class="container">
-        <!-- Paneles de acción -->
         <div class="action-panels">
-            <!-- Panel para actualizar estados de activos -->
             <div class="panel">
                 <h3><i class="fas fa-edit"></i> Actualizar Estado de Activo</h3>
+                <?php
+                // Conexión a la base de datos
+                include 'conexion.php';
+                if ($conn->connect_error) {
+                    echo '<div class="error-message">Error de conexión a la base de datos.</div>';
+                    exit;
+                }
+                // Obtener activos
+                $activos = [];
+                $result = $conn->query("SELECT a.id, a.nombre, c.nombre AS categoria FROM activos a INNER JOIN categorias c ON a.id_categoria = c.id");
+                if ($result) {
+                    while ($row = $result->fetch_assoc()) {
+                        $activos[] = $row;
+                    }
+                }
+                // Obtener sitios
+                $sitios = [];
+                $result2 = $conn->query("SELECT id, nombre FROM sitios");
+                if ($result2) {
+                    while ($row = $result2->fetch_assoc()) {
+                        $sitios[] = $row;
+                    }
+                }
+                // Obtener estados
+                $estados = [];
+                $result3 = $conn->query("SELECT id, nombre FROM estado_activos");
+                if ($result3) {
+                    while ($row = $result3->fetch_assoc()) {
+                        $estados[] = $row;
+                    }
+                }
+                ?>
                 <form id="updateAssetForm" method="post" action="actualizar_estado.php">
                     <div class="form-group">
                         <label for="activo_id"><i class="fas fa-laptop"></i> Seleccionar Activo:</label>
                         <select class="form-control" id="activo_id" name="activo_id" required>
                             <option value="">-- Seleccionar activo --</option>
-                            <!-- Opciones se cargarían desde la base de datos -->
-                            <option value="1">Proyector AULA 3 (Equipos Audiovisuales)</option>
-                            <option value="2">Impresora Oficina (Equipos de Oficina)</option>
-                            <option value="3">Router Principal (Equipos de Red)</option>
-                            <option value="4">Computadora LAB-01 (Equipos de Cómputo)</option>
-                            <option value="5">Escritorio Administración (Mobiliario)</option>
+                            <?php foreach ($activos as $a): ?>
+                                <option value="<?= htmlspecialchars($a['id']) ?>">
+                                    <?= htmlspecialchars($a['nombre']) ?> (<?= htmlspecialchars($a['categoria']) ?>)
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="nuevo_estado"><i class="fas fa-info-circle"></i> Nuevo Estado:</label>
                         <select class="form-control" id="nuevo_estado" name="nuevo_estado" required>
                             <option value="">-- Seleccionar estado --</option>
-                            <option value="1">Operativo</option>
-                            <option value="2">En Mantenimiento</option>
-                            <option value="3">Fuera de Servicio</option>
-                            <option value="4">En Reparación</option>
-                            <option value="5">Dado de Baja</option>
+                            <?php foreach ($estados as $e): ?>
+                                <option value="<?= htmlspecialchars($e['id']) ?>">
+                                    <?= htmlspecialchars($e['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="sitio_destino"><i class="fas fa-map-marker-alt"></i> Sitio Destino:</label>
                         <select class="form-control" id="sitio_destino" name="sitio_destino" required>
                             <option value="">-- Seleccionar sitio --</option>
-                            <option value="1">Aula 101</option>
-                            <option value="2">Aula 102</option>
-                            <option value="3">Laboratorio de Cómputo</option>
-                            <option value="4">Oficina Administrativa</option>
-                            <option value="5">Biblioteca</option>
-                            <option value="6">Almacén</option>
+                            <?php foreach ($sitios as $s): ?>
+                                <option value="<?= htmlspecialchars($s['id']) ?>">
+                                    <?= htmlspecialchars($s['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
@@ -346,30 +313,7 @@
                         </button>
                     </div>
                 </form>
-
-                <!-- Mensajes de confirmación (se mostrarían dinámicamente) -->
                 <div id="messageContainer"></div>
-            </div>
-
-            <!-- Panel para ver historial de activos -->
-            <div class="panel">
-                <h3><i class="fas fa-history"></i> Historial de Activos</h3>
-                <div class="form-group">
-                    <label for="activo_historial"><i class="fas fa-search"></i> Seleccionar Activo:</label>
-                    <select class="form-control" id="activo_historial" name="activo_historial" onchange="cargarHistorial()">
-                        <option value="">-- Seleccionar activo --</option>
-                        <option value="1">Proyector AULA 3 (Equipos Audiovisuales)</option>
-                        <option value="2">Impresora Oficina (Equipos de Oficina)</option>
-                        <option value="3">Router Principal (Equipos de Red)</option>
-                        <option value="4">Computadora LAB-01 (Equipos de Cómputo)</option>
-                        <option value="5">Escritorio Administración (Mobiliario)</option>
-                    </select>
-                </div>
-                <div id="historialContenido">
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">
-                        <i class="fas fa-info-circle"></i> Seleccione un activo para ver su historial.
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -395,118 +339,20 @@
     </footer>
 
     <script>
-        // Función para cargar el historial de un activo
-        function cargarHistorial() {
-            const activoId = document.getElementById('activo_historial').value;
-            const historialDiv = document.getElementById('historialContenido');
-            
-            if (!activoId) {
-                historialDiv.innerHTML = `
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">
-                        <i class="fas fa-info-circle"></i> Seleccione un activo para ver su historial.
-                    </p>
-                `;
-                return;
-            }
-            
-            // Simulación de carga
-            historialDiv.innerHTML = `
-                <p style="text-align: center; padding: 20px;">
-                    <i class="fas fa-spinner fa-spin"></i> Cargando historial...
-                </p>
-            `;
-            
-            // Simular respuesta de servidor con datos de ejemplo
-            setTimeout(() => {
-                const historialEjemplo = generarHistorialEjemplo(activoId);
-                historialDiv.innerHTML = historialEjemplo;
-            }, 1000);
-        }
-
-        // Función para generar historial de ejemplo
-        function generarHistorialEjemplo(activoId) {
-            const historiales = {
-                '1': [
-                    { fecha: '2025-05-25 14:30', tipo: 'modificación', detalles: 'Estado cambiado de "En Mantenimiento" a "Operativo"', sitio: 'Aula 101 → Aula 103' },
-                    { fecha: '2025-05-20 09:15', tipo: 'asignación', detalles: 'Asignado para mantenimiento preventivo', sitio: 'Aula 103 → Almacén' },
-                    { fecha: '2025-05-15 16:45', tipo: 'movimiento', detalles: 'Trasladado por reubicación de equipos', sitio: 'Aula 101 → Aula 103' }
-                ],
-                '2': [
-                    { fecha: '2025-05-28 11:20', tipo: 'modificación', detalles: 'Estado cambiado de "Operativo" a "En Reparación"', sitio: 'Oficina Administrativa' },
-                    { fecha: '2025-05-22 08:30', tipo: 'asignación', detalles: 'Asignado al departamento administrativo', sitio: 'Almacén → Oficina Administrativa' }
-                ],
-                '3': [
-                    { fecha: '2025-05-29 07:45', tipo: 'modificación', detalles: 'Estado cambiado de "Fuera de Servicio" a "Operativo"', sitio: 'Sala de Servidores' },
-                    { fecha: '2025-05-26 13:10', tipo: 'remoción', detalles: 'Retirado por falla en conectividad', sitio: 'Oficina Principal → Sala de Servidores' }
-                ]
-            };
-
-            const historial = historiales[activoId] || [];
-            
-            if (historial.length === 0) {
-                return `
-                    <p style="text-align: center; color: #6c757d; padding: 20px;">
-                        <i class="fas fa-exclamation-circle"></i> No hay historial disponible para este activo.
-                    </p>
-                `;
-            }
-
-            let html = '';
-            historial.forEach(item => {
-                const badgeClass = `badge-${item.tipo === 'modificación' ? 'modify' : 
-                                            item.tipo === 'asignación' ? 'assign' : 
-                                            item.tipo === 'movimiento' ? 'move' : 'remove'}`;
-                
-                html += `
-                    <div class="history-item">
-                        <div class="history-date">
-                            <i class="fas fa-calendar-alt"></i> ${item.fecha}
-                        </div>
-                        <div class="history-details">
-                            <span class="badge-status ${badgeClass}">${item.tipo.toUpperCase()}</span>
-                            ${item.detalles}<br>
-                            <small><i class="fas fa-map-marker-alt"></i> ${item.sitio}</small>
-                        </div>
-                    </div>
-                `;
-            });
-
-            return html;
-        }
-
-        // Función para mostrar el modal de confirmación
+        // Mostrar modal de confirmación al enviar el formulario
         document.getElementById('updateAssetForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const modal = document.getElementById('confirmModal');
-            modal.style.display = 'block';
+            document.getElementById('confirmModal').style.display = 'block';
         });
-
-        // Función para cerrar el modal y cancelar
+        // Cancelar modal
         document.getElementById('cancelBtn').addEventListener('click', function() {
             document.getElementById('confirmModal').style.display = 'none';
         });
-
-        // Función para confirmar la actualización
+        // Confirmar y enviar formulario
         document.getElementById('confirmBtn').addEventListener('click', function() {
             document.getElementById('confirmModal').style.display = 'none';
-            
-            // Simular envío del formulario
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i> Estado actualizado correctamente y registrado en el historial.
-                </div>
-            `;
-            
-            // Limpiar el formulario
-            document.getElementById('updateAssetForm').reset();
-            
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                messageContainer.innerHTML = '';
-            }, 5000);
+            document.getElementById('updateAssetForm').submit();
         });
-
         // Cerrar modal al hacer clic fuera de él
         window.addEventListener('click', function(event) {
             const modal = document.getElementById('confirmModal');

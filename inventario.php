@@ -292,9 +292,13 @@ while ($row = $sitios_result->fetch_assoc()) {
         <div class="inventory-header">
             <div class="filter-buttons">
                 <button class="filter-btn active">Todos</button>
-                <button class="filter-btn">Deportes</button>
-                <button class="filter-btn">Libros</button>
-                <button class="filter-btn">Mobiliario</button>
+                <?php
+                // Obtener categorías desde la base de datos
+                $categorias_result = $conn->query("SELECT nombre FROM categorias ORDER BY nombre ASC");
+                while ($cat = $categorias_result->fetch_assoc()) {
+                    echo '<button class="filter-btn">' . htmlspecialchars($cat['nombre']) . '</button>';
+                }
+                ?>
             </div>
             <div class="search-filter">
                 <i class="fas fa-search"></i>

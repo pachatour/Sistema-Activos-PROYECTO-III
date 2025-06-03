@@ -151,6 +151,11 @@ if (isset($_GET['editar'])) {
             <input type="text" name="apellido" class="form-control" required value="<?= $editando ? $usuario_edit['apellido'] : '' ?>">
         </div>
 
+        <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input type="text" name="telefono" class="form-control" value="<?= $editando ? ($usuario_edit['telefono'] ?? '') : '' ?>">
+        </div>
+
         <div id="estudiante-campos" class="<?= $editando && $usuario_edit['tipo'] !== 'estudiante' ? 'hidden' : '' ?>">
             <div class="col-md-4">
                 <label class="form-label">Nivel</label>
@@ -201,6 +206,7 @@ if (isset($_GET['editar'])) {
                     <th>Identificación</th>
                     <th>Nombre</th>
                     <th>Tipo</th>
+                    <th>Teléfono</th>
                     <th>Curso</th>
                     <th>Paralelo</th>
                     <th>Acciones</th>
@@ -213,6 +219,7 @@ if (isset($_GET['editar'])) {
                     <td><?= $u['identificacion'] ?></td>
                     <td><?= $u['nombre'] . ' ' . $u['apellido'] ?></td>
                     <td><?= ucfirst($u['tipo']) ?></td>
+                    <td><?= $u['telefono'] ?? '-' ?></td>
                     <td><?= $u['curso'] ?? '-' ?></td>
                     <td><?= $u['paralelo'] ?? '-' ?></td>
                     <td>

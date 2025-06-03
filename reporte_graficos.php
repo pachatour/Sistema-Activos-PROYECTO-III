@@ -223,7 +223,7 @@ $conn->close();
                 <canvas id="lineChart"></canvas>
             </div>
             <div class="card">
-                <h2>Distribución por Categoría (Doughnut)</h2>
+                <h2>Distribución por Categoría </h2>
                 <canvas id="doughnutChart"></canvas>
             </div>
         </div>

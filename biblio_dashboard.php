@@ -134,8 +134,10 @@
         <div class="logo"><i class="fas fa-book"></i> BIBLIOTECA</div>
         <nav class="nav-links">
             <a href="logout.php"><i class="fas fa-home"></i> Salir</a>
-            <!--<a href="reportes.php"><i class="fas fa-chart-bar"></i> Reportes</a>
-            <a href="perfil.php"><i class="fas fa-user"></i> Perfil</a>-->
+            <!--
+            <a href="reportes.php"><i class="fas fa-chart-bar"></i> Reportes</a>
+            <a href="perfil.php"><i class="fas fa-user"></i> Perfil</a>
+            -->
         </nav>
     </header>
     <main>
@@ -150,7 +152,7 @@
                 <h3>Crear Estudiante</h3>
                 <p>Crea un estudiante para registrar su prestamo.</p>
             </a>
-            <a href="reportes.php" class="dashboard-card">
+            <a href="reporte_libros.php" class="dashboard-card">
                 <i class="fas fa-file-alt"></i>
                 <h3>Reportes</h3>
                 <p>Visualiza reportes.</p>
@@ -160,26 +162,12 @@
                 <h3>Ver libros</h3>
                 <p>Ver libros disponibles en la biblioteca.</p>
             </a>
+            <a href="dashboard_prestamos.php" class="dashboard-card">
+                <i class='fas fa-eye' style='font-size:48px'></i>
+                <h3>Préstamos activos</h3>
+                <p>Ver los prestamos realizados</p>
+            </a>
         </div>
-        <style>
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 18px;
-            justify-items: center;
-            align-items: center;
-            padding: 30px 5px 20px 5px;
-            min-height: unset;
-        }
-        .dashboard-card {
-            width: 260px;
-            height: 160px;
-            background-color: rgba(0, 30, 60, 0.95);
-            border-radius: 14px;
-            border: 2px solid #FFD700;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
+    </main>
+</body>
+</html>

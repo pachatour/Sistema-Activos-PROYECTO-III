@@ -4,7 +4,7 @@
 
 // Verificar que se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    header("Location: Dashboard.php");
+    header("Location: dashboard_admin.html.php");
     exit;
 }
 
@@ -24,14 +24,11 @@ $observaciones = isset($_POST['observaciones']) ? $_POST['observaciones'] : '';
 $usuario_id = 1; // Usuario actual (simulado)
 
 // Conectar a la base de datos
-$conexion = new mysqli("localhost", "root", "", "sistema_activos");
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-}
+include 'conexion.php';
 
 // Obtener el sitio actual del activo
 $consulta = "SELECT id_sitio, id_estado FROM activos WHERE id = ?";
-$stmt = $conexion->prepare($consulta);
+$stmt = $conn->prepare($consulta);
 $stmt->bind_param("i", $activo_id);
 $stmt->execute();
 $resultado = $stmt->get_result();
@@ -47,12 +44,12 @@ if ($fila = $resultado->fetch_assoc()) {
     }
     
     // Iniciar transacción
-    $conexion->begin_transaction();
+    $conn->begin_transaction();
     
     try {
         // Actualizar el estado y sitio del activo
         $actualizar = "UPDATE activos SET id_estado = ?, id_sitio = ? WHERE id = ?";
-        $stmt = $conexion->prepare($actualizar);
+        $stmt = $conn->prepare($actualizar);
         $stmt->bind_param("iii", $nuevo_estado, $sitio_destino, $activo_id);
         $stmt->execute();
         
@@ -60,30 +57,30 @@ if ($fila = $resultado->fetch_assoc()) {
         $historial = "INSERT INTO historial_activos 
                      (id_activo, id_sitio_origen, id_sitio_destino, id_usuario, tipo_movimiento, observaciones) 
                      VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conexion->prepare($historial);
+        $stmt = $conn->prepare($historial);
         $stmt->bind_param("iiiiss", $activo_id, $sitio_origen, $sitio_destino, $usuario_id, $tipo_movimiento, $observaciones);
         $stmt->execute();
         
         // Confirmar transacción
-        $conexion->commit();
+        $conn->commit();
         
         // Redirigir con mensaje de éxito
-        header("Location: Dashboard.php?success=1");
+        header("Location: dashboard_admin.html?success=1");
         exit;
         
     } catch (Exception $e) {
         // Revertir transacción en caso de error
-        $conexion->rollback();
+        $conn->rollback();
         
         // Redirigir con mensaje de error
-        header("Location: Dashboard.php?error=1&message=" . urlencode($e->getMessage()));
+        header("Location: dashboard_admin.html?error=1&message=" . urlencode($e->getMessage()));
         exit;
     }
 } else {
     // No se encontró el activo
-    header("Location: Dashboard.php?error=1&message=Activo no encontrado");
+    header("Location: dashboard_admin.html?error=1&message=Activo no encontrado");
     exit;
 }
 
 // Cerrar conexión
-$conexion->close();
+$conn->close();
