@@ -1,6 +1,11 @@
 <?php
 include 'conexion.php';
 
+// Usa $conn en vez de $conexion
+$estados = $conn->query("SELECT id, nombre FROM estado_activos ORDER BY id");
+$sitios = $conn->query("SELECT id, nombre FROM sitios ORDER BY id");
+$categorias = $conn->query("SELECT id, nombre FROM categorias ORDER BY id");
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar campos no vacíos (incluyendo espacios)
     $nombre = trim($_POST["nombre"]);
@@ -64,10 +69,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
     
-    $codigoBarras = !empty($_POST["codigoBarras"]) ? $_POST["codigoBarras"] : null;
+    // Quitar código de barras del formulario, pero enviar vacío
+    $codigoBarras = ""; // Siempre vacío
 
     // Preparar y ejecutar
-    $stmt = $conexion->prepare("INSERT INTO activos (nombre, descripcion, id_estado, id_sitio, id_categoria, codigoBarras) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO activos (nombre, descripcion, id_estado, id_sitio, id_categoria, codigoBarras) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiiss", $nombre, $descripcion, $id_estado, $id_sitio, $id_categoria, $codigoBarras);
 
     if ($stmt->execute()) {
@@ -130,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error al registrar: " . addslashes($conexion->error) . "',
+                    text: 'Error al registrar: " . addslashes($conn->error) . "',
                     showConfirmButton: true
                 });
               </script>";
@@ -354,36 +360,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <label>Estado:</label>
       <select name="id_estado" required>
         <option value="">Seleccione un estado</option>
-        <option value="1">Disponible</option>
-        <option value="2">En uso</option>
-        <option value="3">Mantenimiento</option>
-        <option value="4">Baja</option>
+        <?php while($e = $estados->fetch_assoc()): ?>
+          <option value="<?= $e['id'] ?>"><?= htmlspecialchars($e['nombre']) ?></option>
+        <?php endwhile; ?>
       </select>
 
       <label>Sitio:</label>
       <select name="id_sitio" required>
         <option value="">Seleccione un sitio</option>
-        <option value="1">Oficina Central</option>
-        <option value="2">Sucursal Norte</option>
-        <option value="3">Sucursal Sur</option>
+        <?php while($s = $sitios->fetch_assoc()): ?>
+          <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['nombre']) ?></option>
+        <?php endwhile; ?>
       </select>
 
       <label>Categoría:</label>
       <select name="id_categoria" required>
         <option value="">Seleccione una categoría</option>
-        <option value="1">Computadora</option>
-        <option value="2">Impresora</option>
-        <option value="3">Mueble</option>
-        <option value="4">Vehículo</option>
-        <option value="5">Herramienta</option>
-        <option value="6">Celular</option>
-        <option value="7">Router</option>
-        <option value="8">Tablet</option>
-        <option value="9">Otro</option>
+        <?php while($c = $categorias->fetch_assoc()): ?>
+          <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
+        <?php endwhile; ?>
       </select>
 
-      <label>Código de Barras (opcional):</label>
-      <input type="text" name="codigoBarras">
+      <!-- Código de Barras eliminado del formulario -->
 
       <button type="submit">Registrar Activo</button>
     </form>
