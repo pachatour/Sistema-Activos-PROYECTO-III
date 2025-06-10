@@ -236,7 +236,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="crud_libros.php">
+            <a class="navbar-brand" href="estado_activos.php">
                 <i class='fas fa-book-open' style='font-size:24px'></i>
                 <span class="d-none d-sm-inline">ESTADO DE ACTIVOS</span>
             </a>
@@ -246,7 +246,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                       <li class="nav-item">
-                        <a class="nav-link active" href="dashboard_admin.html">
+                        <a class="nav-link active" href="estado_activos.php">
                             <i class='fas fa-home' ></i> Inicio
                         </a>
                     </li>
@@ -278,7 +278,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                            <i class='fas fa-chart-pie'></i> Reportes graficos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -299,7 +299,7 @@
     <div class="container">
         <div class="action-panels">
             <div class="panel">
-                <h3><i class="fas fa-edit"></i> Actualizar Estado de Activo</h3>
+                <h3><i class="fas fa-edit"></i> Actualizar estado de activo</h3>
                 <?php
                 // Conexión a la base de datos
                 include 'conexion.php';
@@ -334,7 +334,7 @@
                 ?>
                 <form id="updateAssetForm" method="post" action="actualizar_estado.php">
                     <div class="form-group">
-                        <label for="activo_id"><i class="fas fa-laptop"></i> Seleccionar Activo:</label>
+                        <label for="activo_id"><i class="fas fa-laptop"></i> SELECCIONAR ACTIVO:</label>
                         <select class="form-control" id="activo_id" name="activo_id" required>
                             <option value="">-- Seleccionar activo --</option>
                             <?php foreach ($activos as $a): ?>
@@ -345,7 +345,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="nuevo_estado"><i class="fas fa-info-circle"></i> Nuevo Estado:</label>
+                        <label for="nuevo_estado"><i class="fas fa-info-circle"></i> NUEVO ESTADO:</label>
                         <select class="form-control" id="nuevo_estado" name="nuevo_estado" required>
                             <option value="">-- Seleccionar estado --</option>
                             <?php foreach ($estados as $e): ?>
@@ -356,7 +356,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="sitio_destino"><i class="fas fa-map-marker-alt"></i> Sitio Destino:</label>
+                        <label for="sitio_destino"><i class="fas fa-map-marker-alt"></i> SITIO DESTINO:</label>
                         <select class="form-control" id="sitio_destino" name="sitio_destino" required>
                             <option value="">-- Seleccionar sitio --</option>
                             <?php foreach ($sitios as $s): ?>
@@ -367,7 +367,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="observaciones"><i class="fas fa-comment"></i> Observaciones:</label>
+                        <label for="observaciones"><i class="fas fa-comment"></i> OBSERVACIONES:</label>
                         <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Ingrese observaciones sobre el cambio de estado..."></textarea>
                     </div>
                     <div class="form-group">
