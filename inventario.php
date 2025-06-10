@@ -105,7 +105,7 @@ while ($row = $sitios_result->fetch_assoc()) {
                 // Obtener categorías desde la base de datos
                 $categorias_result = $conn->query("SELECT nombre FROM categorias ORDER BY nombre ASC");
                 while ($cat = $categorias_result->fetch_assoc()) {
-                    echo '<button class="filter-btn">' . htmlspecialchars($cat['nombre']) . '</button>';
+                    echo '<button class="filter-btn">' . htmlspecialchars($cat['nombre']) . '</button>'; 
                 }
                 ?>
             </div>
@@ -128,7 +128,6 @@ while ($row = $sitios_result->fetch_assoc()) {
                 <tr>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Estado</th>
                     <th>Categoría</th>
                     <th>Ubicación</th>
                     <th>Cantidad</th>
@@ -140,22 +139,6 @@ while ($row = $sitios_result->fetch_assoc()) {
                 <tr>
                     <td><?php echo htmlspecialchars($activo['nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['descripcion']); ?></td>
-                    <td>
-                        <?php 
-                        $clase_estado = '';
-                        switch($activo['id_estado']) {
-                            case 1: $clase_estado = 'status-new'; break;
-                            case 2: $clase_estado = 'status-used'; break;
-                            case 3: $clase_estado = 'status-damaged'; break;
-                            case 4: $clase_estado = 'status-repair'; break;
-                            case 5: $clase_estado = 'status-renew'; break;
-                            default: $clase_estado = 'status-used';
-                        }
-                        ?>
-                        <span class="status-badge <?php echo $clase_estado; ?>">
-                            <?php echo htmlspecialchars($activo['estado_nombre']); ?>
-                        </span>
-                    </td>
                     <td class="categoria"><?php echo htmlspecialchars($activo['categoria_nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['sitio_nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['cantidad']); ?></td>
@@ -264,7 +247,7 @@ while ($row = $sitios_result->fetch_assoc()) {
             const selectedLocation = this.value.trim().toLowerCase();
             const rows = document.querySelectorAll('.inventory-table tbody tr');
             rows.forEach(row => {
-                const cellLocation = row.querySelector('td:nth-child(6)');
+                const cellLocation = row.querySelector('td:nth-child(4)');
                 // Si no hay filtro o coincide la ubicación, mostrar
                 if (!selectedLocation || cellLocation.textContent.trim().toLowerCase() === selectedLocation) {
                     row.style.display = '';
@@ -293,7 +276,7 @@ while ($row = $sitios_result->fetch_assoc()) {
                     }
                 }
                 // Filtro por ubicación
-                const cellLocation = row.querySelector('td:nth-child(6)');
+                const cellLocation = row.querySelector('td:nth-child(4)');
                 const locationMatch = !selectedLocation || cellLocation.textContent.trim().toLowerCase() === selectedLocation;
                 row.style.display = (found && locationMatch) ? '' : 'none';
             });
@@ -310,9 +293,7 @@ while ($row = $sitios_result->fetch_assoc()) {
                 const rows = document.querySelectorAll('.inventory-table tbody tr');
                 rows.forEach(row => {
                     const cellCategoria = row.querySelector('td.categoria');
-
-//                    const cellCategoria = row.querySelector('td:nth-child(5)');
-                    const cellLocation = row.querySelector('td:nth-child(6)');
+                    const cellLocation = row.querySelector('td:nth-child(4)');
                     // Filtro por categoría
                     const categoriaMatch = (categoria === 'Todos' || cellCategoria.textContent.trim() === categoria);
                     // Filtro por ubicación
@@ -339,7 +320,7 @@ while ($row = $sitios_result->fetch_assoc()) {
                 // Busca la fila correspondiente
                 const row = this.closest('tr');
                 const descripcion = row.querySelector('td:nth-child(2)').textContent.trim();
-                const cantidad = row.querySelector('td:nth-child(6)').textContent.trim();
+                const cantidad = row.querySelector('td:nth-child(5)').textContent.trim();
 
                 // Formulario de edición en el modal (solo descripción y cantidad)
                 document.getElementById('editModalBody').innerHTML = `
@@ -357,13 +338,28 @@ while ($row = $sitios_result->fetch_assoc()) {
                     </form>
                 `;
 
-                // Manejar el envío del formulario (solo frontend, sin guardar en BD)
+                // Manejar el envío del formulario (guardar en BD vía AJAX)
                 document.getElementById('editForm').addEventListener('submit', function(e) {
                     e.preventDefault();
-                    modal.hide();
-                    // Actualizar la fila en la tabla con los nuevos valores
-                    row.querySelector('td:nth-child(2)').textContent = this.descripcion.value;
-                    row.querySelector('td:nth-child(6)').textContent = this.cantidad.value;
+                    const formData = new FormData(this);
+                    fetch('actualizar_activo.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Actualizar la fila en la tabla con los nuevos valores
+                            row.querySelector('td:nth-child(2)').textContent = formData.get('descripcion');
+                            row.querySelector('td:nth-child(5)').textContent = formData.get('cantidad');
+                            modal.hide();
+                        } else {
+                            alert('Error al guardar los cambios: ' + (data.message || ''));
+                        }
+                    })
+                    .catch(() => {
+                        alert('Error de conexión al guardar los cambios.');
+                    });
                 });
 
                 modal.show();

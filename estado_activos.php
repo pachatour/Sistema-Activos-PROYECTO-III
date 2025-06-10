@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Actualizar Estado - Administración de Activos</title>
+    <title>Actualizar Estado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -208,6 +208,10 @@
             padding: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
+        a.hover {
+            color: #FFD700;
+            text-decoration: none;
+        }
 
         @media (max-width: 768px) {
             .panel {
@@ -238,7 +242,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="estado_activos.php">
                 <i class='fas fa-book-open' style='font-size:24px'></i>
-                <span class="d-none d-sm-inline">ESTADO DE ACTIVOS</span>
+                <span class="d-none d-sm-inline">ACTUALIZAR ESTADO DE ACTIVOS</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
@@ -299,7 +303,7 @@
     <div class="container">
         <div class="action-panels">
             <div class="panel">
-                <h3><i class="fas fa-edit"></i> Actualizar estado de activo</h3>
+                <h3><i class="fas fa-edit"></i>Actualizar</h3>
                 <?php
                 // Conexión a la base de datos
                 include 'conexion.php';
