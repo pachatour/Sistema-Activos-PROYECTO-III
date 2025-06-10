@@ -1,7 +1,7 @@
-
 <?php
-header("Content-Type: application/vnd.ms-excel");
+header("Content-Type: application/vnd.ms-excel; charset=utf-8");
 header("Content-Disposition: attachment; filename=reporte_activos.xls");
+echo "\xEF\xBB\xBF"; // BOM para UTF-8
 
 $pdo = new PDO("mysql:host=localhost;dbname=activos;charset=utf8", "root", "");
 
@@ -36,19 +36,23 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Tabla
-echo "<table border='1'>";
-echo "<tr><th>ID</th><th>Nombre</th><th>Código</th><th>Categoría</th><th>Estado</th><th>Sitio</th><th>Cantidad</th></tr>";
+// Tabla con estilos mejorados
+echo "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px;'>";
+echo "<tr style='background:#FFD700;color:#00264d;font-weight:bold;text-align:center;'>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Estado</th>
+        <th>Ubicación</th>
+        <th>Cantidad</th>
+      </tr>";
 foreach ($activos as $a) {
-    echo "<tr>
-            <td>{$a['id']}</td>
-            <td>{$a['nombre']}</td>
-            <td>{$a['codigoBarras']}</td>
-            <td>{$a['categoria']}</td>
-            <td>{$a['estado']}</td>
-            <td>{$a['sitio']}</td>
-            <td>{$a['cantidad']}</td>
-        </tr>";
+    echo "<tr style='background:#f8f9fa;'>";
+    echo "<td>" . htmlspecialchars($a['nombre'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+    echo "<td>" . htmlspecialchars($a['categoria'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+    echo "<td>" . htmlspecialchars($a['estado'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+    echo "<td>" . htmlspecialchars($a['sitio'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+    echo "<td style='text-align:center;'>" . htmlspecialchars($a['cantidad'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+    echo "</tr>";
 
     // Historial por activo
     $hist = $pdo->prepare("SELECT h.fecha_movimiento, h.tipo_movimiento, s1.nombre AS origen, 
@@ -63,25 +67,31 @@ foreach ($activos as $a) {
     $movimientos = $hist->fetchAll(PDO::FETCH_ASSOC);
 
     if ($movimientos) {
-        echo "<tr><td colspan='7'>
-                <table border='1' width='100%'>
-                    <tr><th>Fecha</th><th>Tipo</th><th>Origen</th><th>Destino</th><th>Usuario</th><th>Obs.</th></tr>";
+        echo "<tr><td colspan='5' style='padding:0;'>";
+        echo "<table border='1' width='100%' style='border-collapse:collapse;font-size:12px;'>";
+        echo "<tr style='background:#00264d;color:#FFD700;text-align:center;'>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Usuario</th>
+                <th>Observaciones</th>
+              </tr>";
         foreach ($movimientos as $m) {
-            echo "<tr>
-                    <td>{$m['fecha_movimiento']}</td>
-                    <td>{$m['tipo_movimiento']}</td>
-                    <td>{$m['origen']}</td>
-                    <td>{$m['destino']}</td>
-                    <td>{$m['nombre_usuario']}</td>
-                    <td>{$m['observaciones']}</td>
-                  </tr>";
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($m['fecha_movimiento'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "<td>" . htmlspecialchars($m['tipo_movimiento'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "<td>" . htmlspecialchars($m['origen'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "<td>" . htmlspecialchars($m['destino'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "<td>" . htmlspecialchars($m['nombre_usuario'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "<td>" . htmlspecialchars($m['observaciones'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "</td>";
+            echo "</tr>";
         }
         echo "</table></td></tr>";
     } else {
-        echo "<tr><td colspan='7'>Sin historial de movimientos</td></tr>";
+        echo "<tr><td colspan='5' style='text-align:center;color:#dc3545;'>Sin historial de movimientos</td></tr>";
     }
 }
 echo "</table>";
 exit;
 ?>
- 

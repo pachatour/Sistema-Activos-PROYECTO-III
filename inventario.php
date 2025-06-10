@@ -5,13 +5,6 @@ require_once 'conexion.php';
 if (!isset($conn) || !$conn) {
     die("Error: No se pudo conectar a la base de datos.");
 }
-
-// Consultas para obtener datos estadísticos
-$total_activos = $conn->query("SELECT COUNT(*) as total FROM activos")->fetch_assoc()['total'];
-$activos_operativos = $conn->query("SELECT COUNT(*) as total FROM activos WHERE id_estado = 1")->fetch_assoc()['total'];
-$total_reportes = $conn->query("SELECT COUNT(*) as total FROM reportes")->fetch_assoc()['total'];
-$en_reparacion = $conn->query("SELECT COUNT(*) as total FROM activos WHERE id_estado = 4")->fetch_assoc()['total'];
-
 // Consulta para obtener los activos con información relacionada
 $query_activos = "SELECT a.*, 
                  ea.nombre as estado_nombre, 
@@ -35,247 +28,20 @@ while ($row = $sitios_result->fetch_assoc()) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inventario de Activos</title>
+    <title>Inventario</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            color: #fff;
-            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            width: 100%;
-            background-color: rgba(0, 30, 60, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-
-        .navbar h1 {
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-
-        .dashboard {
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .stats-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            flex: 1;
-            min-width: 200px;
-            background-color: rgba(0, 30, 60, 0.9);
-            border-radius: 12px;
-            padding: 20px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-card h3 {
-            color: #FFD700;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-
-        .stat-card p {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        .inventory-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .search-filter {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(255, 255, 255, 0.3);
-            padding: 8px 15px;
-            border-radius: 30px;
-        }
-
-        #searchInput {
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            width: 200px;
-            outline: none;
-        }
-
-        #searchInput::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .filter-btn {
-            background-color: rgba(0, 30, 60, 0.9);
-            color: white;
-            border: 1px solid #FFD700;
-            padding: 8px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background-color: #FFD700;
-            color: #00264d;
-        }
-
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: rgba(6, 43, 92, 0.94);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .inventory-table th {
-            background-color: #FFD700;
-            color: #00264d;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .inventory-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .inventory-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .inventory-table tr:hover {
-            background-color: rgba(255, 215, 0, 0.1);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .status-new {
-            background-color: #28a745;
-        }
-
-        .status-used {
-            background-color: #17a2b8;
-        }
-
-        .status-damaged {
-            background-color: #dc3545;
-        }
-
-        .status-repair {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .status-renew {
-            background-color: #6c757d;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: #FFD700;
-            cursor: pointer;
-            margin: 0 5px;
-            font-size: 1rem;
-            transition: transform 0.3s;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .location-filter {
-            background-color: rgba(255,255,255,0.1);
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            padding: 8px 15px;
-            margin-left: 10px;
-            outline: none;
-            font-size: 1rem;
-        }
-        .location-filter option {
-            color: #00264d;
-        }
-
-        @media (max-width: 768px) {
-            .stats-container {
-                flex-direction: column;
-            }
-            
-            .stat-card {
-                width: 100%;
-            }
-            
-            .inventory-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .inventory-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/inventario.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="prestamos.php">
+        <a class="navbar-brand" href="inventario.php">
             <i class="fas fa-boxes"></i> 
-            <span class="d-none d-sm-inline">Sistema de Gestión de Inventario</span>
+            <span class="d-none d-sm-inline">INVENTARIO</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fas fa-bars"></i>
@@ -289,22 +55,30 @@ while ($row = $sitios_result->fetch_assoc()) {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
-                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
+                            <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0M2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            </svg> Estado
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-users me-1"></i> Historiales
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
+                            <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
+                            <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
+                            </svg> Historiales
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                            </svg> Registrar activos
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                            <i class='fas fa-chart-pie'></i> Reportes graficos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -352,7 +126,6 @@ while ($row = $sitios_result->fetch_assoc()) {
         <table class="inventory-table">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Estado</th>
@@ -365,7 +138,6 @@ while ($row = $sitios_result->fetch_assoc()) {
             <tbody>
                 <?php while ($activo = $resultado_activos->fetch_assoc()): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($activo['id']); ?></td>
                     <td><?php echo htmlspecialchars($activo['nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['descripcion']); ?></td>
                     <td>
@@ -384,13 +156,16 @@ while ($row = $sitios_result->fetch_assoc()) {
                             <?php echo htmlspecialchars($activo['estado_nombre']); ?>
                         </span>
                     </td>
-                    <td><?php echo htmlspecialchars($activo['categoria_nombre']); ?></td>
+                    <td class="categoria"><?php echo htmlspecialchars($activo['categoria_nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['sitio_nombre']); ?></td>
                     <td><?php echo htmlspecialchars($activo['cantidad']); ?></td>
                     <td>
-                        <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" title="Historial"><i class="fas fa-history"></i></button>
-                        <button class="action-btn" title="Reportar"><i class="fas fa-exclamation-circle"></i></button>
+                        <button class="action-btn edit-btn" data-id="<?php echo $activo['id']; ?>" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn history-btn" data-id="<?php echo $activo['id']; ?>" title="Historial">
+                            <i class="fas fa-history"></i>
+                        </button>
                     </td>
                 </tr>
                 <?php endwhile; ?>
@@ -398,6 +173,47 @@ while ($row = $sitios_result->fetch_assoc()) {
         </table>
     </div>
 
+    <!-- Modal para Editar -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: linear-gradient(rgba(0, 0, 80, 0.95), rgba(0, 0, 60, 0.98)); border: 2px solid #FFD700; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.7);">
+          <div class="modal-header" style="border-bottom: 1px solid #FFD700;">
+            <h5 class="modal-title" id="editModalLabel" style="color: #FFD700; font-weight: bold;">
+                <i class="fas fa-edit me-2"></i>Editar Activo
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="editModalBody" style="color: #fff;">
+            <div class="text-center">
+                <div class="spinner-border text-warning" role="status"></div>
+                <span class="ms-2">Cargando...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Historial -->
+    <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: linear-gradient(rgba(0, 0, 80, 0.95), rgba(0, 0, 60, 0.98)); border: 2px solid #FFD700; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.7);">
+          <div class="modal-header" style="border-bottom: 1px solid #FFD700;">
+            <h5 class="modal-title" id="historyModalLabel" style="color: #FFD700; font-weight: bold;">
+                <i class="fas fa-history me-2"></i>Historial del Activo
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="historyModalBody" style="color: #fff;">
+            <div class="text-center">
+                <div class="spinner-border text-warning" role="status"></div>
+                <span class="ms-2">Cargando...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Función para filtrar la tabla en tiempo real
         document.getElementById('searchInput').addEventListener('input', function() {
@@ -422,18 +238,17 @@ while ($row = $sitios_result->fetch_assoc()) {
 
         // Función para filtrar por categoría
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Quitar clase active de todos los botones
+            btn.addEventListener('click', function () {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                // Añadir clase active al botón clickeado
                 this.classList.add('active');
-                
+
                 const categoria = this.textContent.trim();
                 const rows = document.querySelectorAll('.inventory-table tbody tr');
-                
+
                 rows.forEach(row => {
-                    const cellCategoria = row.querySelector('td:nth-child(5)');
-                    
+                    const cellCategoria = row.querySelector('td.categoria');
+                    if (!cellCategoria) return;
+
                     if (categoria === 'Todos' || cellCategoria.textContent.trim() === categoria) {
                         row.style.display = '';
                     } else {
@@ -442,6 +257,7 @@ while ($row = $sitios_result->fetch_assoc()) {
                 });
             });
         });
+
 
         // Filtro por ubicación
         document.getElementById('locationFilter').addEventListener('change', function() {
@@ -493,7 +309,9 @@ while ($row = $sitios_result->fetch_assoc()) {
                 const searchValue = document.getElementById('searchInput').value.toLowerCase();
                 const rows = document.querySelectorAll('.inventory-table tbody tr');
                 rows.forEach(row => {
-                    const cellCategoria = row.querySelector('td:nth-child(5)');
+                    const cellCategoria = row.querySelector('td.categoria');
+
+//                    const cellCategoria = row.querySelector('td:nth-child(5)');
                     const cellLocation = row.querySelector('td:nth-child(6)');
                     // Filtro por categoría
                     const categoriaMatch = (categoria === 'Todos' || cellCategoria.textContent.trim() === categoria);
@@ -510,6 +328,68 @@ while ($row = $sitios_result->fetch_assoc()) {
                     }
                     row.style.display = (categoriaMatch && locationMatch && found) ? '' : 'none';
                 });
+            });
+        });
+
+        // Modal Editar
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const modal = new bootstrap.Modal(document.getElementById('editModal'));
+                // Busca la fila correspondiente
+                const row = this.closest('tr');
+                const descripcion = row.querySelector('td:nth-child(2)').textContent.trim();
+                const cantidad = row.querySelector('td:nth-child(6)').textContent.trim();
+
+                // Formulario de edición en el modal (solo descripción y cantidad)
+                document.getElementById('editModalBody').innerHTML = `
+                    <form id="editForm">
+                        <input type="hidden" name="id" value="${id}">
+                        <div class="mb-3">
+                            <label class="form-label" style="color:#FFD700;">Descripción</label>
+                            <textarea class="form-control" name="descripcion" required style="background:rgba(0,30,60,0.85);color:#fff;border:1px solid #FFD700;">${descripcion}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="color:#FFD700;">Cantidad</label>
+                            <input type="number" class="form-control" name="cantidad" value="${cantidad}" min="1" required style="background:rgba(0,30,60,0.85);color:#fff;border:1px solid #FFD700;">
+                        </div>
+                        <button type="submit" class="btn btn-warning" style="color:#00264d;font-weight:bold;">Guardar Cambios</button>
+                    </form>
+                `;
+
+                // Manejar el envío del formulario (solo frontend, sin guardar en BD)
+                document.getElementById('editForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    modal.hide();
+                    // Actualizar la fila en la tabla con los nuevos valores
+                    row.querySelector('td:nth-child(2)').textContent = this.descripcion.value;
+                    row.querySelector('td:nth-child(6)').textContent = this.cantidad.value;
+                });
+
+                modal.show();
+            });
+        });
+
+        // Modal Historial
+        document.querySelectorAll('.history-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+                document.getElementById('historyModalBody').innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-warning" role="status"></div>
+                        <span class="ms-2">Cargando...</span>
+                    </div>
+                `;
+                fetch('historial_activo.php?id=' + encodeURIComponent(id))
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('historyModalBody').innerHTML = html;
+                    })
+                    .catch(() => {
+                        document.getElementById('historyModalBody').innerHTML = '<div class="alert alert-danger">Error al cargar el historial.</div>';
+                    });
+                modal.show();
             });
         });
     </script>

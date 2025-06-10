@@ -70,241 +70,19 @@ $activos = getActivosFiltrados($conn, $filtros);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Activos</title>
+    <title>Reporte de activos</title>
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            color: #fff;
-            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            width: 100%;
-            background-color: rgba(0, 30, 60, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-
-        .navbar h1 {
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-
-        .dashboard {
-            padding: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .form-container {
-            background-color: rgba(0, 30, 60, 0.9);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #FFD700;
-            font-weight: bold;
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 10px;
-            background-color: rgba(7, 12, 77, 0.68);
-            border: 1px solid #FFD700;
-            border-radius: 6px;
-            color: white;
-            outline: none;
-        }
-
-        .form-select:focus {
-            border-color: #3498db;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background-color: #FFD700;
-            color: #00264d;
-        }
-
-        .btn-primary:hover {
-            background-color: #ffe033;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #bd2130;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: rgba(6, 43, 92, 0.94);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            margin-top: 20px;
-        }
-
-        .inventory-table th {
-            background-color: #FFD700;
-            color: #00264d;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .inventory-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .inventory-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .inventory-table tr:hover {
-            background-color: rgba(255, 215, 0, 0.1);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .status-new {
-            background-color: #28a745;
-        }
-
-        .status-used {
-            background-color: #17a2b8;
-        }
-
-        .status-damaged {
-            background-color: #dc3545;
-        }
-
-        .status-repair {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .status-renew {
-            background-color: #6c757d;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .inventory-table {
-                display: block;
-                overflow-x: auto;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/reportes.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="crud_libros.php">
+            <a class="navbar-brand" href="reportes.php">
                 <i class="fas fa-clipboard-list" style='font-size:24px'></i>
                 <span class="d-none d-sm-inline">REPORTE DE ACTIVOS</span>
             </a>
@@ -325,22 +103,30 @@ $activos = getActivosFiltrados($conn, $filtros);
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
-                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
+                            <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0M2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            </svg> Estado
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-users me-1"></i> Historiales
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
+                            <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
+                            <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
+                            </svg> Historiales
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                            </svg> Registrar activos
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                             <i class='fas fa-chart-pie'></i> Reportes graficos
                         </a>
                     </li>
                     <!--<li class="nav-item">
@@ -418,9 +204,9 @@ $activos = getActivosFiltrados($conn, $filtros);
         <table class="inventory-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <!-- <th>ID</th> -->
                     <th>Nombre</th>
-                    <th>Código</th>
+                    <!-- <th>Código</th> -->
                     <th>Categoría</th>
                     <th>Estado</th>
                     <th>Ubicación</th>
@@ -431,9 +217,9 @@ $activos = getActivosFiltrados($conn, $filtros);
             <tbody>
                 <?php foreach ($activos as $a): ?>
                     <tr>
-                        <td><?= $a['id'] ?></td>
+                        <!-- <td><?= $a['id'] ?></td> -->
                         <td><?= htmlspecialchars($a['nombre']) ?></td>
-                        <td><?= htmlspecialchars($a['codigoBarras']) ?></td>
+                        <!-- <td><?= htmlspecialchars($a['codigoBarras']) ?></td> -->
                         <td><?= htmlspecialchars($a['categoria']) ?></td>
                         <td>
                             <?php 
@@ -458,7 +244,7 @@ $activos = getActivosFiltrados($conn, $filtros);
                 <?php endforeach; ?>
                 <?php if (empty($activos)): ?>
                     <tr>
-                        <td colspan="8" class="text-center">No se encontraron activos con los filtros aplicados</td>
+                        <td colspan="6" class="text-center">No se encontraron activos con los filtros aplicados</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

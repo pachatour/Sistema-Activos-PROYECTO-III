@@ -7,14 +7,14 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $id_activo = intval($_GET['id']);
 
 // Conectar a la base de datos
-$conexion = new mysqli("localhost", "root", "", "sistema_activos");
-if ($conexion->connect_error) {
-    die("<p>Error de conexión: " . $conexion->connect_error . "</p>");
+include 'conexion.php'; // Corregido: comillas simples para el nombre del archivo
+if ($conn->connect_error) {
+    die("<p>Error de conexión: " . $conn->connect_error . "</p>");
 }
 
 // Primero obtener información del activo
 $consulta_activo = "SELECT nombre FROM activos WHERE id = $id_activo";
-$resultado_activo = $conexion->query($consulta_activo);
+$resultado_activo = $conn->query($consulta_activo);
 
 if ($resultado_activo->num_rows == 0) {
     echo "<p>No se encontró el activo solicitado.</p>";
@@ -43,7 +43,7 @@ WHERE
 ORDER BY 
     h.fecha_movimiento DESC";
 
-$resultado = $conexion->query($consulta);
+$resultado = $conn->query($consulta);
 
 // Mostrar el historial
 echo "<h4>Historial para: $nombre_activo</h4>";
@@ -81,5 +81,5 @@ if ($resultado->num_rows > 0) {
     echo "<p>No hay registros en el historial para este activo.</p>";
 }
 
-$conexion->close();
+$conn->close();
 ?>

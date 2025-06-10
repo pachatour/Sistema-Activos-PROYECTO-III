@@ -18,18 +18,84 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         if ($password === $user['constrasena'])  {
+            // Guardar sesión antes de mostrar el mensaje
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['nombre_usuario'];
             $_SESSION['user_type'] = $user['id_tipo_usuario'];
             $_SESSION['user_permissions'] = $user['parametro_edit_config'];
 
-            switch ($user['id_tipo_usuario']) {
-                case 1: header("Location: dashboard_admin.html"); break;
-                case 2: header("Location: manager_dashboard.php"); break;
-                case 3: header("Location: formulario.php"); break;
-                case 4: header("Location: biblio_dashboard.php"); break;
-                default: header("Location: login.php");
-            }
+            // Mostrar mensaje interactivo de bienvenida antes de redirigir
+            echo "<!DOCTYPE html>
+            <html lang='es'>
+            <head>
+                <meta charset='UTF-8'>
+                <title>Bienvenido</title>
+                <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'>
+                <style>
+                    body {
+                        background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)), url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+                        background-size: cover;
+                        min-height: 100vh;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: #FFD700;
+                        font-family: Arial, sans-serif;
+                    }
+                    .welcome-box {
+                        background: rgba(0,30,60,0.92);
+                        border-radius: 18px;
+                        padding: 50px 40px;
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+                        text-align: center;
+                        border: 2px solid #FFD700;
+                        animation: popin 1s cubic-bezier(.68,-0.55,.27,1.55);
+                    }
+                    @keyframes popin {
+                        0% { transform: scale(0.7); opacity: 0; }
+                        80% { transform: scale(1.1); }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    .welcome-box i {
+                        font-size: 3rem;
+                        margin-bottom: 18px;
+                        color: #FFD700;
+                        animation: bounce 1.2s infinite alternate;
+                    }
+                    @keyframes bounce {
+                        to { transform: translateY(-10px);}
+                    }
+                    .welcome-box h1 {
+                        font-size: 2.2rem;
+                        margin-bottom: 10px;
+                        color: #FFD700;
+                    }
+                    .welcome-box p {
+                        color: #fff;
+                        font-size: 1.1rem;
+                        margin-bottom: 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='welcome-box'>
+                    <i class='fas fa-smile-beam'></i>
+                    <h1>¡Bienvenido, " . htmlspecialchars($user['nombre_usuario']) . "!</h1>
+                    <p>Redirigiendo a tu panel...</p>
+                </div>
+                <script>
+                    setTimeout(function() {";
+                        switch ($user['id_tipo_usuario']) {
+                            case 1: echo "window.location.href = 'dashboard_admin.html';"; break;
+                            case 2: echo "window.location.href = 'manager_dashboard.php';"; break;
+                            case 3: echo "window.location.href = 'formulario.php';"; break;
+                            case 4: echo "window.location.href = 'biblio_dashboard.php';"; break;
+                            default: echo "window.location.href = 'login.php';";
+                        }
+            echo "}, 1700);
+                </script>
+            </body>
+            </html>";
             exit();
         } else {
             $error_message = "Contraseña incorrecta.";
@@ -179,6 +245,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <img src="https://cdn-icons-png.flaticon.com/512/1251/1251570.png" alt="Inicio de sesión">
             <h2>INICIAR SESIÓN</h2>
         </div>
+        <?php if (isset($error_message)): ?>
+            <div style="background:#dc3545;color:#fff;padding:12px 18px;border-radius:6px;margin-bottom:18px;text-align:center;font-weight:bold;">
+                <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error_message) ?>
+            </div>
+        <?php endif; ?>
         <form action="login.php" method="POST">
             <label for="username"><i class="fas fa-user"></i> Usuario:</label>
             <input type="text" id="username" name="username" required placeholder="Ingrese su usuario">

@@ -1,7 +1,6 @@
 <?php
 include 'conexion.php';
 
-// Usa $conn en vez de $conexion
 $estados = $conn->query("SELECT id, nombre FROM estado_activos ORDER BY id");
 $sitios = $conn->query("SELECT id, nombre FROM sitios ORDER BY id");
 $categorias = $conn->query("SELECT id, nombre FROM categorias ORDER BY id");
@@ -24,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
     
-    // Validación de id_estado (1-4)
+    // Validación de id_estado
     $id_estado = isset($_POST["id_estado"]) ? (int)$_POST["id_estado"] : null;
     if ($id_estado === null || $id_estado < 1 || $id_estado > 4) {
         echo "<script>
