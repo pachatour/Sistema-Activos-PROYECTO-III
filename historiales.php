@@ -26,306 +26,33 @@ function obtenerHistorial($conn, $activo_id) {
     }
     return $historial;
 }
+
+// AJAX endpoint para historial dinámico
+if (isset($_GET['ajax_historial']) && isset($_GET['activo_id'])) {
+    header('Content-Type: application/json');
+    $historial = obtenerHistorial($conn, intval($_GET['activo_id']));
+    echo json_encode($historial);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Historiales - Administración de Activos</title>
+    <title>Historiales</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            color: #fff;
-            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar {
-            width: 100%;
-            background-color: rgba(0, 30, 60, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-
-        .navbar img {
-            height: 50px;
-        }
-
-        .navbar h1 {
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-
-        .container {
-            flex-grow: 1;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Estilos para los paneles de acción */
-        .action-panels {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 30px;
-            margin-bottom: 30px;
-        }
-
-        .panel {
-            flex: 1;
-            min-width: 500px;
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #333;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .panel h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #001e3c;
-            border-bottom: 2px solid #FFD700;
-            padding-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #FFD700;
-            box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background-color: #001e3c;
-            color: white;
-            border: 2px solid #FFD700;
-        }
-
-        .btn-primary:hover {
-            background-color: #003366;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .history-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            border-left: 4px solid #FFD700;
-            margin-bottom: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-date {
-            color: #6c757d;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-
-        .history-details {
-            margin-top: 8px;
-            color: #333;
-        }
-
-        .badge-status {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .badge-move {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .badge-assign {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-modify {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .badge-remove {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        /* Estilos para el modal de confirmación */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-        }
-
-        .modal-content {
-            background-color: #fff;
-            color: #333;
-            margin: 10% auto;
-            padding: 25px;
-            border-radius: 12px;
-            width: 50%;
-            max-width: 500px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            border: 2px solid #FFD700;
-        }
-
-        .modal-title {
-            margin-top: 0;
-            color: #001e3c;
-            border-bottom: 2px solid #FFD700;
-            padding-bottom: 10px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        .success-message {
-            color: #28a745;
-            background-color: rgba(40, 167, 69, 0.1);
-            border: 1px solid #28a745;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-
-        .error-message {
-            color: #dc3545;
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid #dc3545;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-
-        #historialContenido {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 10px;
-            background-color: #f8f9fa;
-        }
-
-        footer {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            padding: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            .panel {
-                min-width: 100%;
-            }
-            
-            .navbar h1 {
-                font-size: 1.1rem;
-            }
-
-            .navbar img {
-                height: 40px;
-            }
-
-            .container {
-                padding: 20px 10px;
-            }
-
-            .modal-content {
-                width: 90%;
-                margin: 20% auto;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/historiales.css">
 </head>
 <body>
      <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="crud_libros.php">
+            <a class="navbar-brand" href="dashboard_admin.html">
                 <i class='fas fa-book-open' style='font-size:24px'></i>
                 <span class="d-none d-sm-inline">HISTORIAL DE ACTIVOS</span>
             </a>
@@ -334,11 +61,6 @@ function obtenerHistorial($conn, $activo_id) {
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                      <li class="nav-item">
-                        <a class="nav-link active" href="dashboard_admin.html">
-                            <i class='fas fa-home' ></i> Inicio
-                        </a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="inventario.php">
                             <i class="fa-brands fa-wpforms"></i> Inventario
@@ -346,22 +68,21 @@ function obtenerHistorial($conn, $activo_id) {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
-                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
+                            <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0M2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            </svg> Estado
                         </a>
                     </li>
-                    <!--<li class="nav-item">
-                        <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-users me-1"></i> Historiales
-                        </a>
-                    </li>-->
                     <li class="nav-item">
                         <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                            </svg> Registrar activos
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                            <i class='fas fa-chart-pie'></i> Reportes graficos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -384,9 +105,9 @@ function obtenerHistorial($conn, $activo_id) {
             <div class="panel">
                 <h3><i class="fas fa-history"></i> Historial de Activos</h3>
                 <div class="form-group">
-                    <form method="get" id="formHistorial">
+                    <form method="get" id="formHistorial" autocomplete="off">
                         <label for="activo_historial"><i class="fas fa-search"></i> Seleccionar Activo:</label>
-                        <select class="form-control" id="activo_historial" name="activo_historial" onchange="document.getElementById('formHistorial').submit()">
+                        <select class="form-control" id="activo_historial" name="activo_historial">
                             <option value="">-- Seleccionar activo --</option>
                             <?php foreach ($activos as $a): ?>
                                 <option value="<?= htmlspecialchars($a['id']) ?>" <?= (isset($_GET['activo_historial']) && $_GET['activo_historial'] == $a['id']) ? 'selected' : '' ?>>
@@ -411,26 +132,41 @@ function obtenerHistorial($conn, $activo_id) {
                         } else {
                             foreach ($historial as $item) {
                                 $badgeClass = 'badge-modify';
-                                if ($item['tipo_movimiento'] == 'traslado') $badgeClass = 'badge-move';
-                                elseif ($item['tipo_movimiento'] == 'asignación') $badgeClass = 'badge-assign';
-                                elseif ($item['tipo_movimiento'] == 'baja') $badgeClass = 'badge-remove';
-                                echo '<div class="history-item">
-                                    <div class="history-date">
-                                        <i class="fas fa-calendar-alt"></i> '.htmlspecialchars($item['fecha_movimiento']).'
-                                    </div>
-                                    <div class="history-details">
-                                        <span class="badge-status '.$badgeClass.'">'.strtoupper(htmlspecialchars($item['tipo_movimiento'])).'</span>
-                                        '.htmlspecialchars($item['observaciones']).'<br>
-                                        <small><i class="fas fa-map-marker-alt"></i> ';
+                                $icon = '<i class="fas fa-edit history-icon"></i>';
+                                if ($item['tipo_movimiento'] == 'traslado') {
+                                    $badgeClass = 'badge-move';
+                                    $icon = '<i class="fas fa-exchange-alt history-icon"></i>';
+                                }
+                                elseif ($item['tipo_movimiento'] == 'asignación') {
+                                    $badgeClass = 'badge-assign';
+                                    $icon = '<i class="fas fa-user-plus history-icon"></i>';
+                                }
+                                elseif ($item['tipo_movimiento'] == 'baja') {
+                                    $badgeClass = 'badge-remove';
+                                    $icon = '<i class="fas fa-trash-alt history-icon"></i>';
+                                }
+                                echo '<div class="history-item">'
+                                    .$icon.
+                                    '<div class="history-content">'
+                                    .'<div class="history-date">'
+                                        .'<i class="fas fa-calendar-alt"></i> '.htmlspecialchars($item['fecha_movimiento']).
+                                    '</div>'
+                                    .'<div class="history-details">'
+                                        .'<span class="badge-status '.$badgeClass.'">'.strtoupper(htmlspecialchars($item['tipo_movimiento'])).'</span> '
+                                        .htmlspecialchars($item['observaciones']).'<br>'
+                                        .'<small><i class="fas fa-map-marker-alt"></i> ';
                                 if ($item['sitio_origen']) echo htmlspecialchars($item['sitio_origen']).' → ';
                                 echo htmlspecialchars($item['sitio_destino']);
                                 echo '</small><br>';
                                 echo '<small><i class="fas fa-user"></i> '.htmlspecialchars($item['nombre_usuario']).'</small>';
-                                echo '</div></div>';
+                                echo '</div></div></div>';
                             }
                         }
                     }
                     ?>
+                </div>
+                <div id="historialLoader" style="display:none;">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando historial...
                 </div>
             </div>
         </div>
@@ -438,5 +174,68 @@ function obtenerHistorial($conn, $activo_id) {
     <footer>
         <p>© 2025 Luz a las Naciones</p>
     </footer>
+    <script>
+    // UX: Carga dinámica del historial con feedback visual
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('activo_historial');
+        const historialDiv = document.getElementById('historialContenido');
+        const loader = document.getElementById('historialLoader');
+        select.addEventListener('change', function() {
+            const activoId = select.value;
+            if (!activoId) {
+                historialDiv.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;"><i class="fas fa-info-circle"></i> Seleccione un activo para ver su historial.</p>';
+                return;
+            }
+            loader.style.display = 'block';
+            historialDiv.style.opacity = '0.5';
+            fetch('?ajax_historial=1&activo_id=' + encodeURIComponent(activoId))
+                .then(r => r.json())
+                .then(historial => {
+                    loader.style.display = 'none';
+                    historialDiv.style.opacity = '1';
+                    if (!historial.length) {
+                        historialDiv.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 20px;"><i class="fas fa-exclamation-circle"></i> No hay historial disponible para este activo.</p>';
+                        return;
+                    }
+                    let html = '';
+                    historial.forEach(item => {
+                        let badgeClass = 'badge-modify', icon = '<i class="fas fa-edit history-icon"></i>';
+                        if (item.tipo_movimiento === 'traslado') {
+                            badgeClass = 'badge-move';
+                            icon = '<i class="fas fa-exchange-alt history-icon"></i>';
+                        } else if (item.tipo_movimiento === 'asignación') {
+                            badgeClass = 'badge-assign';
+                            icon = '<i class="fas fa-user-plus history-icon"></i>';
+                        } else if (item.tipo_movimiento === 'baja') {
+                            badgeClass = 'badge-remove';
+                            icon = '<i class="fas fa-trash-alt history-icon"></i>';
+                        }
+                        html += `<div class="history-item">${icon}
+                            <div class="history-content">
+                                <div class="history-date"><i class="fas fa-calendar-alt"></i> ${item.fecha_movimiento}</div>
+                                <div class="history-details">
+                                    <span class="badge-status ${badgeClass}">${item.tipo_movimiento.toUpperCase()}</span>
+                                    ${item.observaciones}<br>
+                                    <small><i class="fas fa-map-marker-alt"></i> ${item.sitio_origen ? item.sitio_origen + ' → ' : ''}${item.sitio_destino}</small><br>
+                                    <small><i class="fas fa-user"></i> ${item.nombre_usuario}</small>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    historialDiv.innerHTML = html;
+                    historialDiv.scrollTo({top: 0, behavior: 'smooth'});
+                })
+                .catch(() => {
+                    loader.style.display = 'none';
+                    historialDiv.style.opacity = '1';
+                    historialDiv.innerHTML = '<p class="error-message"><i class="fas fa-exclamation-triangle"></i> Error al cargar el historial.</p>';
+                });
+        });
+        // Si hay un activo seleccionado al cargar, dispara el evento para AJAX
+        if (select.value) {
+            select.dispatchEvent(new Event('change'));
+        }
+    });
+    </script>
 </body>
 </html>

@@ -1,0 +1,152 @@
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      color: #fff;
+      background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                  url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      width: 100%;
+      background-color: rgba(0, 30, 60, 0.95);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .navbar h1 {
+      font-size: 1.5rem;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-container {
+      background-color: rgba(0, 30, 60, 0.92);
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      max-width: 600px; /* Más compacto */
+      margin: 32px auto;
+      padding: 24px 18px 18px 18px; /* Menos padding */
+      border: 2px solid #FFD700;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    h1 {
+      text-align: center;
+      color: #FFD700;
+      margin-bottom: 30px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+      align-items: end;
+    }
+
+    form > label {
+      grid-column: span 1;
+      margin-bottom: 2px;
+      margin-top: 0;
+    }
+
+    form > input,
+    form > select {
+      grid-column: span 1;
+      margin-bottom: 8px;
+    }
+
+    /* Hacer que el botón ocupe toda la fila */
+    form > button {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 700px) {
+      .form-container {
+        padding: 12px 4px 10px 4px;
+        max-width: 98vw;
+      }
+      form {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      h1 {
+        font-size: 1.1rem;
+      }
+    }
+
+    input, select {
+      padding: 8px 10px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 0.98rem;
+      transition: background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      background: rgba(16, 4, 70, 0.88);
+      box-shadow: 0 0 0 2px #FFD700;
+    }
+
+    button {
+      margin-top: 8px;
+      padding: 10px;
+      background: #FFD700;
+      border: none;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1rem;
+      color: #00264d;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #fffbe6;
+      color: #00264d;
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .error, .validacion-error {
+      color: #e74c3c;
+      font-size: 0.95em;
+      margin-top: 2px;
+      margin-bottom: -10px;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .form-container {
+        padding: 20px 8px 18px 8px;
+        max-width: 128vw;
+      }
+      h1 {
+        font-size: 1.1rem;
+      }
+    }

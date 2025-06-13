@@ -9,13 +9,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar campos no vacíos (incluyendo espacios)
     $nombre = trim($_POST["nombre"]);
     $descripcion = trim($_POST["descripcion"]);
-    
-    if (empty($nombre) || empty($descripcion)) {
+    $cantidad = isset($_POST["cantidad"]) ? (int)$_POST["cantidad"] : null;
+
+    if (empty($nombre) || empty($descripcion) || $cantidad === null) {
         echo "<script>
                 Swal.fire({
                     icon: 'error',
                     title: 'Campos incompletos',
-                    text: 'Nombre y descripción no pueden estar vacíos',
+                    text: 'Nombre, descripción y cantidad no pueden estar vacíos',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+              </script>";
+        exit();
+    }
+    if ($cantidad < 1) {
+        echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Cantidad inválida',
+                    text: 'La cantidad debe ser mayor a 0',
                     showConfirmButton: false,
                     timer: 3000
                 });
@@ -72,8 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $codigoBarras = ""; // Siempre vacío
 
     // Preparar y ejecutar
-    $stmt = $conn->prepare("INSERT INTO activos (nombre, descripcion, id_estado, id_sitio, id_categoria, codigoBarras) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssiiss", $nombre, $descripcion, $id_estado, $id_sitio, $id_categoria, $codigoBarras);
+    $stmt = $conn->prepare("INSERT INTO activos (nombre, descripcion, cantidad, id_estado, id_sitio, id_categoria, codigoBarras) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssi iiss", $nombre, $descripcion, $cantidad, $id_estado, $id_sitio, $id_categoria, $codigoBarras);
 
     if ($stmt->execute()) {
         echo "<script>
@@ -160,140 +173,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-    }
-
-    body {
-      color: #fff;
-      background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                  url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-      background-size: cover;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .navbar {
-      width: 100%;
-      background-color: rgba(0, 30, 60, 0.95);
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-
-    .navbar h1 {
-      font-size: 1.5rem;
-      color: white;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-    }
-
-    .form-container {
-      background-color: rgba(0, 30, 60, 0.92);
-      border-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      max-width: 900px; /* Aumenta el ancho máximo */
-      margin: 40px auto;
-      padding: 40px 32px 32px 32px;
-      border: 2px solid #FFD700;
-      animation: fadeIn 0.5s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-
-    h1 {
-      text-align: center;
-      color: #FFD700;
-      margin-bottom: 30px;
-      font-size: 1.6rem;
-      font-weight: 600;
-      letter-spacing: 1px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    label {
-      color: #FFD700;
-      font-weight: 500;
-      margin-bottom: 5px;
-      font-size: 1rem;
-      margin-top: 0;
-    }
-
-    input, select {
-      padding: 12px 15px;
-      border: none;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      font-size: 1rem;
-      transition: background 0.3s, box-shadow 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      background: rgba(255,255,255,0.18);
-      box-shadow: 0 0 0 2px #FFD700;
-    }
-
-    button {
-      margin-top: 18px;
-      padding: 14px;
-      background: #FFD700;
-      border: none;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #00264d;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, transform 0.2s;
-    }
-
-    button:hover {
-      background: #fffbe6;
-      color: #00264d;
-      transform: translateY(-2px) scale(1.03);
-    }
-
-    .error, .validacion-error {
-      color: #e74c3c;
-      font-size: 0.95em;
-      margin-top: 2px;
-      margin-bottom: -10px;
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      .form-container {
-        padding: 20px 8px 18px 8px;
-        max-width: 128vw;
-      }
-      h1 {
-        font-size: 1.1rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/formulario.css">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
       <div class="container-fluid">
-          <a class="navbar-brand" href="crud_libros.php">
+          <a class="navbar-brand" href="dashboard_admin.html">
               <i class='fas fa-book-open' style='font-size:24px'></i>
               <span class="d-none d-sm-inline">REGISTROS DE ACTIVOS</span>
           </a>
@@ -302,11 +187,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
              <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                        <a class="nav-link active" href="dashboard_admin.html">
-                            <i class='fas fa-home' ></i> Inicio
-                        </a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="inventario.php">
                             <i class="fa-brands fa-wpforms"></i> Inventario
@@ -314,22 +194,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
-                            <i class="fas fa-exchange-alt me-1"></i> Estado
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
+                            <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0M2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            </svg>Estado
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-users me-1"></i> Historiales
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
+                            <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
+                            <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
+                            </svg>Historiales
                         </a>
                     </li>
-                    <!--<li class="nav-item">
-                        <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
-                        </a>
-                    </li>-->
                     <li class="nav-item">
                         <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
+                            <i class='fas fa-chart-pie'></i>Reportes graficos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -349,42 +230,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   <div class="form-container">
-    <form method="POST" id="formularioActivo" onsubmit="return validarFormulario()">
-      <label>Nombre del activo:</label>
-      <input type="text" name="nombre" required>
+      <form method="POST" id="formularioActivo" onsubmit="return validarFormulario()">
+        <label>Nombre del activo:</label>
+        <input type="text" name="nombre" required>
 
-      <label>Descripción:</label>
-      <input type="text" name="descripcion" required>
+        <label>Descripción:</label>
+        <input type="text" name="descripcion" required>
 
-      <label>Estado:</label>
-      <select name="id_estado" required>
-        <option value="">Seleccione un estado</option>
-        <?php while($e = $estados->fetch_assoc()): ?>
-          <option value="<?= $e['id'] ?>"><?= htmlspecialchars($e['nombre']) ?></option>
-        <?php endwhile; ?>
-      </select>
+        <label>Cantidad:</label>
+        <input type="number" name="cantidad" min="1" required>
 
-      <label>Sitio:</label>
-      <select name="id_sitio" required>
-        <option value="">Seleccione un sitio</option>
-        <?php while($s = $sitios->fetch_assoc()): ?>
-          <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['nombre']) ?></option>
-        <?php endwhile; ?>
-      </select>
+        <label>Estado:</label>
+        <select name="id_estado" required>
+          <option value="">Seleccione un estado</option>
+          <?php while($e = $estados->fetch_assoc()): ?>
+            <option value="<?= $e['id'] ?>"><?= htmlspecialchars($e['nombre']) ?></option>
+          <?php endwhile; ?>
+        </select>
 
-      <label>Categoría:</label>
-      <select name="id_categoria" required>
-        <option value="">Seleccione una categoría</option>
-        <?php while($c = $categorias->fetch_assoc()): ?>
-          <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
-        <?php endwhile; ?>
-      </select>
+        <label>Sitio:</label>
+        <select name="id_sitio" required>
+          <option value="">Seleccione un sitio</option>
+          <?php while($s = $sitios->fetch_assoc()): ?>
+            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['nombre']) ?></option>
+          <?php endwhile; ?>
+        </select>
 
-      <!-- Código de Barras eliminado del formulario -->
+        <label>Categoría:</label>
+        <select name="id_categoria" required>
+          <option value="">Seleccione una categoría</option>
+          <?php while($c = $categorias->fetch_assoc()): ?>
+            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
+          <?php endwhile; ?>
+        </select>
 
-      <button type="submit">Registrar Activo</button>
-    </form>
-  </div>
+        <!-- Código de Barras eliminado del formulario -->
+
+        <button type="submit">Registrar Activo</button>
+      </form>
+    </div>
 
   <!-- SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -406,6 +290,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function validarFormulario() {
       const nombre = document.querySelector('input[name="nombre"]');
       const descripcion = document.querySelector('input[name="descripcion"]');
+      const cantidad = document.querySelector('input[name="cantidad"]');
       const idEstado = document.querySelector('input[name="id_estado"]');
       const idSitio = document.querySelector('input[name="id_sitio"]');
       const idCategoria = document.querySelector('input[name="id_categoria"]');
@@ -423,6 +308,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById('errorDescripcion').style.display = 'block';
         descripcion.setCustomValidity('Este campo no puede estar vacío');
         valido = false;
+      }
+
+      // Validar cantidad
+      if (cantidad.value.trim() === '' || isNaN(cantidad.value) || parseInt(cantidad.value) < 1) {
+        cantidad.setCustomValidity('La cantidad debe ser mayor a 0');
+        valido = false;
+      } else {
+        cantidad.setCustomValidity('');
       }
 
       // Validar ID Estado (1-4)
@@ -457,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('formularioActivo');
   const nombreInput = form.querySelector('input[name="nombre"]');
   const descripcionInput = form.querySelector('input[name="descripcion"]');
+  const cantidadInput = form.querySelector('input[name="cantidad"]');
   const idEstadoInput = form.querySelector('input[name="id_estado"]');
   const idSitioInput = form.querySelector('input[name="id_sitio"]');
   const idCategoriaInput = form.querySelector('input[name="id_categoria"]');
@@ -475,6 +369,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     if (input.value.trim() === '') {
       mostrarError(input, 'Este campo no puede estar vacío');
+      if (errorElement) errorElement.style.display = 'block';
+    } else if (input.name === 'cantidad' && (isNaN(input.value) || parseInt(input.value) < 1)) {
+      mostrarError(input, 'La cantidad debe ser mayor a 0');
       if (errorElement) errorElement.style.display = 'block';
     } else {
       limpiarError(input);
