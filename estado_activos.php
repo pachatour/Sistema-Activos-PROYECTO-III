@@ -42,7 +42,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="reporte_graficos.php">
-                            <i class="fas fa-chart-pie"></i> Gráficos
+                            <i class='fas fa-chart-pie'></i> Reportes graficos
                         </a>
                     </li>
                     <li class="nav-item">

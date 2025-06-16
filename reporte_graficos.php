@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+include 'conexion.php';
 
 // Obtener filtros
 $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
@@ -71,123 +71,12 @@ $conn->close();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
-
+    <link rel="stylesheet" href="css/reporte_graficos.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-        body {
-            color: #fff;
-            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
-                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .navbar {
-            width: 100%;
-            background-color: rgba(0, 30, 60, 0.95);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-        .navbar img {
-            height: 50px;
-        }
-        .navbar h1 {
-            font-size: 1.5rem;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-        }
-        .dashboard {
-            max-width: 1200px;
-            margin: 40px auto 0 auto;
-            padding: 0 20px 40px 20px;
-            flex-grow: 1;
-        }
-        .assets-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0 30px 0;
-            gap: 20px;
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .filter-btn {
-            padding: 8px 16px;
-            background: #f1f1f1;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            color: #00264d;
-            transition: background 0.2s, color 0.2s;
-        }
-        .filter-btn.active, .filter-btn:focus {
-            background: #FFD700;
-            color: #00264d;
-        }
-        .cards-row {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .card {
-            flex: 1 1 320px;
-            background-color: rgba(0, 30, 60, 0.92);
-            border-radius: 12px;
-            border: 2px solid #FFD700;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            padding: 24px 20px 16px 20px;
-            margin-bottom: 0;
-            min-width: 320px;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .card h2 {
-            font-size: 1.1em;
-            color: #FFD700;
-            margin-bottom: 18px;
-            text-align: center;
-            text-shadow: 1px 1px 3px #000;
-        }
-        .card canvas {
-            margin: 0 auto;
-            display: block;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-        }
-        footer {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            padding: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 30, 60, 0.85);
-            margin-top: auto;
-        }
-        @media (max-width: 900px) {
-            .cards-row { flex-direction: column; }
-            .dashboard { padding: 0 5px 40px 5px; }
-            .card { min-width: 0; max-width: 100%; }
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
      <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
@@ -213,19 +102,14 @@ $conn->close();
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-users me-1"></i> Historiales
+                            <i class="fas fa-history"></i>  Historiales
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-chart-bar me-1"></i> Registrar activos
+                            <i class="fas fa-plus-circle"></i> Registrar activos
                         </a>
                     </li>
-                    <!--<li class="nav-item">
-                        <a class="nav-link active" href="reporte_graficos.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes graficos
-                        </a>
-                    </li>-->
                     <li class="nav-item">
                         <a class="nav-link active" href="reportes.php">
                             <i class="fas fa-chart-bar me-1"></i> Reportes
@@ -256,26 +140,185 @@ $conn->close();
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="filter-btn active">Filtrar</button>
+                <button type="button" id="exportAllBtn" class="filter-btn active">
+                    <i class="fas fa-download"></i> Exportar Todo
+                </button>
             </div>
         </form>
         <div class="cards-row">
             <div class="card">
                 <h2>Distribución por Estado (Pastel)</h2>
-                <canvas id="pieChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+                
+                <!-- Tabla de datos para gráfico de pastel -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_pie = array_sum($data_estado);
+                        foreach ($data_estado as $estado_nombre => $cantidad): 
+                            $porcentaje = $total_pie > 0 ? round(($cantidad / $total_pie) * 100, 2) : 0;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($estado_nombre) ?></td>
+                            <td><?= $cantidad ?></td>
+                            <td><?= $porcentaje ?>%</td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="total-row">
+                            <td><strong>Total</strong></td>
+                            <td><strong><?= $total_pie ?></strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="chart-actions">
+                    <button class="chart-btn" onclick="exportChart('pieChart', 'distribucion_estado_pastel')">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="chart-btn" onclick="printChart('pieChart')">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
             </div>
             <div class="card">
                 <h2>Distribución por Categoría (Barras)</h2>
-                <canvas id="barChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+                
+                <!-- Tabla de datos para gráfico de barras -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_bar = array_sum($data_categoria);
+                        foreach ($data_categoria as $categoria_nombre => $cantidad): 
+                            $porcentaje = $total_bar > 0 ? round(($cantidad / $total_bar) * 100, 2) : 0;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($categoria_nombre) ?></td>
+                            <td><?= $cantidad ?></td>
+                            <td><?= $porcentaje ?>%</td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="total-row">
+                            <td><strong>Total</strong></td>
+                            <td><strong><?= $total_bar ?></strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="chart-actions">
+                    <button class="chart-btn" onclick="exportChart('barChart', 'distribucion_categoria_barras')">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="chart-btn" onclick="printChart('barChart')">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
             </div>
         </div>
         <div class="cards-row">
             <div class="card">
                 <h2>Distribución por Estado (Línea)</h2>
-                <canvas id="lineChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+                
+                <!-- Tabla de datos para gráfico de línea -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_line = array_sum($data_estado);
+                        foreach ($data_estado as $estado_nombre => $cantidad): 
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($estado_nombre) ?></td>
+                            <td><?= $cantidad ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="total-row">
+                            <td><strong>Total</strong></td>
+                            <td><strong><?= $total_line ?></strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="chart-actions">
+                    <button class="chart-btn" onclick="exportChart('lineChart', 'distribucion_estado_linea')">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="chart-btn" onclick="printChart('lineChart')">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
             </div>
             <div class="card">
-                <h2>Distribución por Categoría </h2>
-                <canvas id="doughnutChart"></canvas>
+                <h2>Distribución por Categoría (Dona)</h2>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+                
+                <!-- Tabla de datos para gráfico de dona -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_doughnut = array_sum($data_categoria);
+                        foreach ($data_categoria as $categoria_nombre => $cantidad): 
+                            $porcentaje = $total_doughnut > 0 ? round(($cantidad / $total_doughnut) * 100, 2) : 0;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($categoria_nombre) ?></td>
+                            <td><?= $cantidad ?></td>
+                            <td><?= $porcentaje ?>%</td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="total-row">
+                            <td><strong>Total</strong></td>
+                            <td><strong><?= $total_doughnut ?></strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="chart-actions">
+                    <button class="chart-btn" onclick="exportChart('doughnutChart', 'distribucion_categoria_dona')">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                    <button class="chart-btn" onclick="printChart('doughnutChart')">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -296,29 +339,51 @@ $conn->close();
     const doughnutLabels = <?= json_encode($data_doughnut_labels) ?>;
     const doughnutData = <?= json_encode($data_doughnut) ?>;
 
+    // Colores consistentes para los gráficos
+    const chartColors = [
+        '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8',
+        '#6610f2', '#e83e8c', '#fd7e14', '#20c997', '#0dcaf0'
+    ];
+
     // Gráfica de pastel
-    new Chart(document.getElementById('pieChart'), {
+    const pieChart = new Chart(document.getElementById('pieChart'), {
         type: 'pie',
         data: {
             labels: pieLabels,
             datasets: [{
                 data: pieData,
-                backgroundColor: [
-                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8'
-                ],
+                backgroundColor: chartColors,
+                borderWidth: 1
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' },
+                legend: { 
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 20
+                    }
+                },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             let total = pieData.reduce((a,b)=>a+b,0);
                             let value = context.parsed;
                             let percent = total ? (value/total*100).toFixed(1) : 0;
-                            return context.label + ': ' + value + ' (' + percent + '%)';
+                            return `${context.label}: ${value} (${percent}%)`;
                         }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución de Activos por Estado',
+                    font: {
+                        size: 16
                     }
                 }
             }
@@ -326,17 +391,20 @@ $conn->close();
     });
 
     // Gráfica de barras
-    new Chart(document.getElementById('barChart'), {
+    const barChart = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
             labels: barLabels,
             datasets: [{
                 label: 'Cantidad de Activos',
                 data: barData,
-                backgroundColor: '#1976d2'
+                backgroundColor: chartColors,
+                borderWidth: 1
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             indexAxis: 'y',
             plugins: {
                 legend: { display: false },
@@ -344,21 +412,40 @@ $conn->close();
                     callbacks: {
                         label: function(context) {
                             let total = barData.reduce((a,b)=>a+b,0);
-                            let value = context.parsed.x;
+                            let value = context.parsed.y;
                             let percent = total ? (value/total*100).toFixed(1) : 0;
-                            return value + ' (' + percent + '%)';
+                            return `${value} activos (${percent}%)`;
                         }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Activos por Categoría',
+                    font: {
+                        size: 16
                     }
                 }
             },
             scales: {
-                x: { beginAtZero: true }
+                x: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Activos'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Categorías'
+                    }
+                }
             }
         }
     });
 
     // Gráfica de línea
-    new Chart(document.getElementById('lineChart'), {
+    const lineChart = new Chart(document.getElementById('lineChart'), {
         type: 'line',
         data: {
             labels: lineLabels,
@@ -368,36 +455,150 @@ $conn->close();
                 fill: false,
                 borderColor: '#3c8dbc',
                 backgroundColor: '#3c8dbc',
+                borderWidth: 3,
+                pointBackgroundColor: '#3c8dbc',
+                pointRadius: 5,
+                pointHoverRadius: 7,
                 tension: 0.3
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.parsed.y} activos`;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución de Activos por Estado',
+                    font: {
+                        size: 16
+                    }
+                }
             },
             scales: {
-                y: { beginAtZero: true }
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad de Activos'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Estados'
+                    }
+                }
             }
         }
     });
 
     // Gráfica doughnut
-    new Chart(document.getElementById('doughnutChart'), {
+    const doughnutChart = new Chart(document.getElementById('doughnutChart'), {
         type: 'doughnut',
         data: {
             labels: doughnutLabels,
             datasets: [{
                 data: doughnutData,
-                backgroundColor: [
-                    '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#ff9f40'
-                ]
+                backgroundColor: chartColors,
+                borderWidth: 1
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' }
-            }
+                legend: { 
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = doughnutData.reduce((a,b)=>a+b,0);
+                            let value = context.parsed;
+                            let percent = total ? (value/total*100).toFixed(1) : 0;
+                            return `${context.label}: ${value} (${percent}%)`;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución de Activos por Categoría',
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            cutout: '60%'
         }
+    });
+
+    // Función para exportar un gráfico como imagen
+    function exportChart(chartId, fileName) {
+        const chartCanvas = document.getElementById(chartId);
+        const link = document.createElement('a');
+        link.download = `${fileName}.png`;
+        link.href = chartCanvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // Función para imprimir un gráfico
+    function printChart(chartId) {
+        const chartCanvas = document.getElementById(chartId);
+        const win = window.open('', '', 'width=800,height=600');
+        win.document.write('<html><head><title>Imprimir Gráfico</title></head><body>');
+        win.document.write(`<img src="${chartCanvas.toDataURL('image/png')}" style="max-width:100%;"/>`);
+        win.document.write('</body></html>');
+        win.document.close();
+        win.focus();
+        setTimeout(() => {
+            win.print();
+            win.close();
+        }, 500);
+    }
+
+    // Función para exportar todos los gráficos como PDF
+    document.getElementById('exportAllBtn').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+        const charts = ['pieChart', 'barChart', 'lineChart', 'doughnutChart'];
+        const promises = [];
+        
+        charts.forEach((chartId, index) => {
+            const canvas = document.getElementById(chartId);
+            promises.push(
+                html2canvas(canvas).then(canvasImage => {
+                    const imgData = canvasImage.toDataURL('image/png');
+                    if (index === 0) {
+                        doc.addImage(imgData, 'PNG', 20, 20, 250, 150);
+                    } else if (index === 1) {
+                        doc.addImage(imgData, 'PNG', 20, 180, 250, 150);
+                    } else if (index === 2) {
+                        doc.addPage();
+                        doc.addImage(imgData, 'PNG', 20, 20, 250, 150);
+                    } else if (index === 3) {
+                        doc.addImage(imgData, 'PNG', 20, 180, 250, 150);
+                    }
+                })
+            );
+        });
+        
+        Promise.all(promises).then(() => {
+            doc.save('reporte_graficos_activos.pdf');
+        });
     });
     </script>
 </body>

@@ -1,0 +1,166 @@
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            width: 100%;
+            background-color: rgba(0, 30, 60, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .navbar img {
+            height: 50px;
+        }
+        .navbar h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        .dashboard {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            padding: 0 20px 40px 20px;
+            flex-grow: 1;
+        }
+        .assets-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0 30px 0;
+            gap: 20px;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f1f1f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #00264d;
+            transition: background 0.2s, color 0.2s;
+        }
+        .filter-btn.active, .filter-btn:focus {
+            background: #FFD700;
+            color: #00264d;
+        }
+        .cards-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            flex: 1 1 320px;
+            background-color: rgba(0, 30, 60, 0.92);
+            border-radius: 12px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            padding: 24px 20px 16px 20px;
+            margin-bottom: 0;
+            min-width: 320px;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h2 {
+            font-size: 1.1em;
+            color: #FFD700;
+            margin-bottom: 18px;
+            text-align: center;
+            text-shadow: 1px 1px 3px #000;
+        }
+        .card canvas {
+            margin: 0 auto;
+            display: block;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            padding: 10px;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin-bottom: 15px;
+        }
+        .chart-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .chart-btn {
+            padding: 5px 10px;
+            background: #FFD700;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            color: #00264d;
+            transition: background 0.2s;
+        }
+        .chart-btn:hover {
+            background: #ffc800;
+        }
+        .data-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .data-table th {
+            background-color: rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: rgba(0, 123, 255, 0.2) !important;
+        }
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 30, 60, 0.85);
+            margin-top: auto;
+        }
+        @media (max-width: 900px) {
+            .cards-row { flex-direction: column; }
+            .dashboard { padding: 0 5px 40px 5px; }
+            .card { min-width: 0; max-width: 100%; }
+        }

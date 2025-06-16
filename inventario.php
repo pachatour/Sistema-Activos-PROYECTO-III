@@ -39,7 +39,7 @@ while ($row = $sitios_result->fetch_assoc()) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="inventario.php">
+        <a class="navbar-brand" href="dashboard_admin.html">
             <i class="fas fa-boxes"></i> 
             <span class="d-none d-sm-inline">INVENTARIO</span>
         </a>
@@ -48,11 +48,6 @@ while ($row = $sitios_result->fetch_assoc()) {
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard_admin.html">
-                            <i class='fas fa-home' ></i> Inicio
-                        </a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="estado_activos.php">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
