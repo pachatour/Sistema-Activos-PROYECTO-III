@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-
+include 'verificar_sesion.php';
 // Obtener todos los libros
 $libros = $conn->query("SELECT a.*, c.nombre as categoria, e.nombre as estado, s.nombre as sitio
     FROM activos a
@@ -51,54 +51,48 @@ if (isset($_GET['eliminar'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="stylesara.css">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="crud_libros.php">
-            <i class='fas fa-book-open' style='font-size:24px'></i>
-            <span class="d-none d-sm-inline">ADMINISTRACIÓN DE LIBROS</span>
+        <a class="navbar-brand" href="biblio_dashboard.php">
+            <i class="fas fa-boxes"></i>
+            <span class="d-none d-sm-inline">ADMINISTRACIÓN LIBROS</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-bars"></i>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="biblio_dashboard.php">
-                        <i class="fa-brands fa-wpforms"></i> Dashboard
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-arrow-alt-circle-down"></i> Ir a 
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="prestamos.php">
-                        <i class="fas fa-exchange-alt me-1"></i> Préstamos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="crud_estudiantes.php">
-                        <i class="fas fa-users me-1"></i> Crear Usuarios
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="reporte_libros.php">
-                        <i class="fas fa-chart-bar me-1"></i> Reportes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger logout-link" href="logout.php">
-                        <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
-                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="biblio_dashboard.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                        <li><a class="dropdown-item" href="prestamos.php"><i class='fas fa-cubes'></i> &nbsp; Prestar </a></li>
+                        <li><a class="dropdown-item" href="crud_estudiantes.php"><i class="fas fa-plus-circle"></i> &nbsp; Usuarios</a></li>
+                        <li><a class="dropdown-item" href="reporte_libros.php"><i class="fas fa-chart-line"></i> &nbsp; Reportes</a></li>
+                        <li><a class="dropdown-item" href="dashboard_prestamos.php"><i class="fas fa-history"></i> &nbsp; Prestamos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp; Cerrar Sesión</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+
     <div class="container">
         <?php if ($editando && $libro_edit): ?>
         <div class="crud-title">Editar Libro</div>
         <form class="crud-form" method="post" action="crud_libros.php">
             <input type="hidden" name="accion" value="editar">
-            <input type="hidden" name="id" value="<?= $libro_edit['id'] ?>">
             <input type="text" name="nombre" placeholder="Nombre" required value="<?= htmlspecialchars($libro_edit['nombre']) ?>">
             <input type="text" name="codigoBarras" placeholder="Código de Barras" required value="<?= htmlspecialchars($libro_edit['codigoBarras']) ?>">
             <input type="number" name="cantidad" placeholder="Cantidad" min="1" required value="<?= htmlspecialchars($libro_edit['cantidad']) ?>">
@@ -107,14 +101,12 @@ if (isset($_GET['eliminar'])) {
             <a href="crud_libros.php" style="color:#FFD700;font-weight:bold;text-decoration:none;margin-left:10px;">Cancelar</a>
         </form>
         <?php endif; ?>
-        <div class="crud-title" style="margin-top:30px;font-size:1.3rem;">Lista de Libros</div>
         <div style="text-align:right; margin-bottom:15px;">
             <input type="text" id="buscadorLibros" placeholder="Buscar libro..." style="padding:8px; border-radius:6px; border:1px solid #FFD700; width:220px; color:#003366;">
         </div>
         <table id="tablaLibros">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Código</th>
                     <th>Descripción</th>
@@ -127,7 +119,6 @@ if (isset($_GET['eliminar'])) {
             <tbody>
                 <?php while($row = $libros->fetch_assoc()): ?>
                 <tr>
-                    <td><?= $row['id'] ?></td>
                     <td><?= htmlspecialchars($row['nombre']) ?></td>
                     <td><?= htmlspecialchars($row['codigoBarras']) ?></td>
                     <td><?= htmlspecialchars($row['descripcion']) ?></td>
@@ -136,7 +127,6 @@ if (isset($_GET['eliminar'])) {
                     <td><?= $row['cantidad'] ?></td>
                     <td class="crud-actions">
                         <a href="crud_libros.php?editar=<?= $row['id'] ?>" class="edit" title="Editar"><i class="fas fa-edit"></i></a>
-                        <a href="crud_libros.php?eliminar=<?= $row['id'] ?>" class="delete" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar este libro?');"><i class="fas fa-trash"></i></a>
                     </td>
                 </tr>
                 <?php endwhile; ?>
@@ -154,5 +144,25 @@ if (isset($_GET['eliminar'])) {
         });
     });
     </script>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #002244; color: #fff;">
+        <div class="modal-header">
+            <h5 class="modal-title" id="logoutModalLabel"><i class="fas fa-exclamation-circle text-warning"></i> Confirmar salida</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+            ¿Estás seguro de que deseas cerrar sesión?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <a href="logout.php" class="btn btn-danger">Cerrar sesión</a>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

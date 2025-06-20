@@ -15,21 +15,6 @@
             flex-direction: column;
         }
 
-                 .dropdown-menu {
-                background-color: rgb(0, 30, 60);
-                border: 2px solid #FFD700;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            }
-
-            .dropdown-item {
-                color: #fff !important; /* Cambia el color de los elementos del dropdown */
-            }
-
-            .dropdown-item:hover {
-                background-color: rgba(255, 215, 0, 0.2); /* Color de fondo al pasar el ratón */
-                color: #FFD700 !important; /* Cambia el color del texto al pasar el ratón */
-            }
         .navbar {
             width: 100%;
             background-color: rgba(0, 30, 60, 0.95);
@@ -41,12 +26,15 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
+        .navbar img {
+            height: 50px;
+        }
+
         .navbar h1 {
             font-size: 1.5rem;
             color: white;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
         }
-
 
         .container {
             flex-grow: 1;
@@ -144,47 +132,55 @@
         }
 
         .history-item {
-            padding: 16px 12px;
+            padding: 12px;
             border-bottom: 1px solid #eee;
             border-left: 4px solid #FFD700;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             background-color: #f8f9fa;
-            border-radius: 6px;
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            transition: background 0.2s;
+            border-radius: 4px;
         }
-        .history-item:hover {
-            background: #fffbe7;
+
+        .history-item:last-child {
+            border-bottom: none;
         }
-        .history-icon {
-            font-size: 1.8em;
-            margin-right: 8px;
-            color: #FFD700;
-            flex-shrink: 0;
-        }
-        .history-content {
-            flex: 1;
-        }
+
         .history-date {
             color: #6c757d;
-            font-size: 0.95em;
+            font-size: 0.9em;
             font-weight: bold;
-            margin-bottom: 4px;
         }
+
         .history-details {
-            margin-top: 4px;
+            margin-top: 8px;
             color: #333;
-            font-size: 1em;
         }
+
         .badge-status {
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 12px;
-            font-size: 0.85em;
+            font-size: 0.8em;
             font-weight: bold;
             margin-right: 8px;
-            letter-spacing: 1px;
+        }
+
+        .badge-move {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .badge-assign {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-modify {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .badge-remove {
+            background-color: #dc3545;
+            color: white;
         }
 
         /* Estilos para el modal de confirmación */
@@ -250,15 +246,8 @@
             border-radius: 6px;
             padding: 10px;
             background-color: #f8f9fa;
-            min-height: 120px;
-            transition: box-shadow 0.2s;
         }
-        #historialLoader {
-            text-align: center;
-            color: #001e3c;
-            font-size: 1.2em;
-            padding: 30px 0;
-        }
+
         footer {
             text-align: center;
             color: rgba(255, 255, 255, 0.8);
@@ -287,12 +276,5 @@
             .modal-content {
                 width: 90%;
                 margin: 20% auto;
-            }
-            .history-item {
-                flex-direction: column;
-                gap: 4px;
-            }
-            .history-icon {
-                margin-bottom: 4px;
             }
         }

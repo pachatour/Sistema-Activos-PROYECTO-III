@@ -1,5 +1,7 @@
 <?php
 session_start();
+session_regenerate_id(true); // Protege contra fijación de sesión
+
 include 'conexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -86,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <script>
                     setTimeout(function() {";
                         switch ($user['id_tipo_usuario']) {
-                            case 1: echo "window.location.href = 'dashboard_admin.html';"; break;
+                            case 1: echo "window.location.href = 'dashboard_admin.php';"; break;
                             case 2: echo "window.location.href = 'manager_dashboard.php';"; break;
                             case 3: echo "window.location.href = 'formulario.php';"; break;
                             case 4: echo "window.location.href = 'biblio_dashboard.php';"; break;

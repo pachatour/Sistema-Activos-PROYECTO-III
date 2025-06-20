@@ -18,12 +18,13 @@
         }
 
         body {
-            color: var(--text-light);
-            background: linear-gradient(135deg, var(--dark-bg) 0%,rgb(42, 85, 150) 100%);
+           color: #fff;
+            background: linear-gradient(rgba(0, 0, 80, 0.85), rgba(0, 0, 60, 0.9)),
+                        url('https://miro.medium.com/v2/resize:fit:1400/1*cRjevzZSKByeCrwjFmBrIg.jpeg') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            line-height: 1.6;
         }
 
         /* Navbar Estilizado */

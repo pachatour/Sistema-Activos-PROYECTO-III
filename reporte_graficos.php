@@ -1,6 +1,6 @@
 <?php
 include 'conexion.php';
-
+include 'verificar_sesion.php';
 // Obtener filtros
 $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : '';
@@ -77,53 +77,43 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
 </head>
 <body>
-     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+       <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="crud_libros.php">
-                <img src="https://cdn-icons-png.freepik.com/256/1321/1321887.png?semt=ais_hybrid" alt="Logo" />
-                <span class="d-none d-sm-inline">  REPORTE GRÁFICO DE ACTIVOS</span>
+            <a class="navbar-brand" href="dashboard_admin.php">
+                <i class="fas fa-boxes"></i> 
+                <span class="d-none d-sm-inline">REPORTE GRÁFICOS</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="inventario.php">
-                            <i class="fa-brands fa-wpforms"></i> Inventario
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-arrow-alt-circle-down"></i> Ir a
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="estado_activos.php">
-                            <i class="fas fa-exchange-alt me-1"></i> Estado
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="historiales.php">
-                            <i class="fas fa-history"></i>  Historiales
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="formulario.php">
-                            <i class="fas fa-plus-circle"></i> Registrar activos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="reportes.php">
-                            <i class="fas fa-chart-bar me-1"></i> Reportes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger logout-link" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
-                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="dashboard_admin.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                            <li><a class="dropdown-item" href="formulario.php"><i class="fas fa-plus-circle"></i> &nbsp Formulario</a></li>
+                            <li><a class="dropdown-item" href="estado_activos.php"><i class="fas fa-chart-line"></i> &nbsp Estado Activos</a></li>
+                            <li><a class="dropdown-item" href="historiales.php"><i class="fas fa-history"></i> &nbsp Historiales</a></li>
+                            <li><a class="dropdown-item" href="reportes.php"><i class="fas fa-file-alt"></i> &nbsp Reportes</a></li>
+                            <li><a class="dropdown-item" href="regresion.php"><i class="fas fa-project-diagram"></i> &nbsp Regresión</a></li>
+                            <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp Cerrar Sesión</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <div class="dashboard">
         <form method="get" class="assets-header">
             <div class="filter-buttons">

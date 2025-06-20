@@ -1,3 +1,6 @@
+<?php
+include 'verificar_sesion.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,54 +14,45 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="stylesheet" href="css/estado_activos.css">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard_admin.html">
-                <i class="fas fa-sync-alt"></i>
-                <span>ACTUALIZAR ESTADO</span>
+            <a class="navbar-brand" href="dashboard_admin.php">
+                <i class="fas fa-boxes"></i> 
+                <span class="d-none d-sm-inline">ESTADO ACTIVOS</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="inventario.php">
-                            <i class="fas fa-boxes"></i> Inventario
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-arrow-alt-circle-down"></i> Ir a
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="historiales.php">
-                            <i class="fas fa-history"></i> Historiales
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="formulario.php">
-                            <i class="fas fa-plus-circle"></i> Registrar
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reporte_graficos.php">
-                            <i class='fas fa-chart-pie'></i> Reportes graficos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reportes.php">
-                            <i class="fas fa-chart-bar"></i> Reportes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link logout-link" href="logout.php">
-                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="dashboard_admin.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                            <li><a class="dropdown-item" href="formulario.php"><i class="fas fa-plus-circle"></i> &nbsp Formulario</a></li>
+                            <li><a class="dropdown-item" href="historiales.php"><i class="fas fa-history"></i> &nbsp Historiales</a></li>
+                            <li><a class="dropdown-item" href="reportes.php"><i class="fas fa-file-alt"></i> &nbsp Reportes</a></li>
+                            <li><a class="dropdown-item" href="reporte_graficos.php"><i class="fas fa-chart-pie"></i> &nbsp Reportes Gráficos</a></li>
+                            <li><a class="dropdown-item" href="regresion.php"><i class="fas fa-project-diagram"></i> &nbsp Regresión</a></li>
+                            <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp Cerrar Sesión</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!-- Contenido Principal -->
     <div class="container">

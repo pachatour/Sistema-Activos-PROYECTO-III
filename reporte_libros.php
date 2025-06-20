@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-
+include 'verificar_sesion.php';
 // Consulta de reportes de libros (préstamos y devoluciones)
 $reportes = $conn->query("
     SELECT p.id, 
@@ -161,51 +161,44 @@ while ($row = $grafico_estados->fetch_assoc()) {
             .chart-card { min-width: 0; max-width: 100%; }
         }
     </style>
+
+
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="prestamos.php">
-            <i class="fas fa-chart-bar me-2"></i>
-            <span class="d-none d-sm-inline">REPORTE DE LIBROS</span>
+        <a class="navbar-brand" href="biblio_dashboard.php">
+            <i class="fas fa-boxes"></i>
+            <span class="d-none d-sm-inline">Reporte de Libros (Préstamos y Devoluciones)</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-bars"></i>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="biblio_dashboard.php">
-                        <i class="fa-brands fa-wpforms"></i> Dashboard
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-arrow-alt-circle-down"></i> Ir a 
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="prestamos.php">
-                        <i class="fas fa-exchange-alt me-1"></i> Préstamos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="crud_libros.php">
-                        <i class="fas fa-book me-1"></i> Libros
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="crud_estudiantes.php">
-                        <i class="fas fa-users me-1"></i> Crear Usuarios
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger logout-link" href="logout.php">
-                        <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
-                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="biblio_dashboard.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                        <li><a class="dropdown-item" href="prestamos.php"><i class='fas fa-cubes'></i> &nbsp; Prestar </a></li>
+                        <li><a class="dropdown-item" href="crud_estudiantes.php"><i class="fas fa-plus-circle"></i> &nbsp; Usuarios</a></li>
+                        <li><a class="dropdown-item" href="crud_libros.php"><i class="fas fa-file-alt"></i> &nbsp; Libros</a></li>
+                        <li><a class="dropdown-item" href="dashboard_prestamos.php"><i class="fas fa-history"></i> &nbsp; Prestamos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp; Cerrar Sesión</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-
 <div class="dashboard">
-    <h2 style="color: #FFD700; margin-bottom: 25px;"><i class="fas fa-list"></i> Reporte de Libros (Préstamos y Devoluciones)</h2>
     <div class="table-responsive">
         <table class="inventory-table">
             <thead>
@@ -268,16 +261,6 @@ while ($row = $grafico_estados->fetch_assoc()) {
     </div>
 </div>
 <script>
-    // Confirmar antes de cerrar sesión
-    document.querySelectorAll('.logout-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-                window.location.href = this.href;
-            }
-        });
-    });
-
     // Gráficos de libros por estado
     const labels = <?= json_encode($labels) ?>;
     const values = <?= json_encode($values) ?>;
@@ -342,6 +325,26 @@ while ($row = $grafico_estados->fetch_assoc()) {
         }
     });
 </script>
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #002244; color: #fff;">
+        <div class="modal-header">
+            <h5 class="modal-title" id="logoutModalLabel"><i class="fas fa-exclamation-circle text-warning"></i> Confirmar salida</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+            ¿Estás seguro de que deseas cerrar sesión?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <a href="logout.php" class="btn btn-danger">Cerrar sesión</a>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
 <?php

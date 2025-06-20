@@ -1,5 +1,6 @@
 <?php
 require_once 'conexion.php';
+include 'verificar_sesion.php';
 
 // Verificar que la conexión se realizó correctamente
 if (!isset($conn) || !$conn) {
@@ -29,7 +30,7 @@ while ($row = $sitios_result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <title>Inventario</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,68 +38,45 @@ while ($row = $sitios_result->fetch_assoc()) {
     <link rel="icon" type="image/svg" href="img/gear-fill.svg">
     <link rel="icon" type="image/svg" href="https://cdn-icons-png.flaticon.com/512/10871/10871903.png">
     <link rel="stylesheet" href="css/inventario.css">
+
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
 </head>
 <body>
-     <nav class="navbar">
-        <a href="dashboard_admin.html" class="navbar-brand">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMLf1emihqA5SgR4Eo9cdwbQdNxLRLcEOg5g&s" alt="Logo Univalle">
-            <h1>ADMINISTRACIÓN DE ACTIVOS</h1>
-        </a>
-
-        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <div class="navbar-menu" id="navbarMenu">
-            <a href="dashboard_admin.html" class="nav-link">
-                <i class="fas fa-home"></i>
-                Dashboard
+         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard_admin.php">
+                <i class="fas fa-boxes"></i> 
+                <span class="d-none d-sm-inline">INVENTARIO</span>
             </a>
-
-            <div class="dropdown">
-                <button class="dropdown-toggle" onclick="toggleDropdown()">
-                    <i class="fas fa-th-large"></i>
-                    Módulos
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="dropdown-menu">
-                    <a href="inventario.php" class="dropdown-item">
-                        <i class="fas fa-boxes"></i>
-                        Inventario
-                    </a>
-                    <a href="reportes.php" class="dropdown-item">
-                        <i class="fas fa-chart-line"></i>
-                        Reportes
-                    </a>
-                    <a href="estado_activos.php" class="dropdown-item">
-                        <i class="fas fa-pen"></i>
-                        Editar Estado
-                    </a>
-                    <a href="historiales.php" class="dropdown-item">
-                        <i class="fas fa-history"></i>
-                        Historiales
-                    </a>
-                    <a href="biblio_dashboard.php" class="dropdown-item">
-                        <i class="fas fa-book"></i>
-                        Biblioteca
-                    </a>
-                    <a href="formulario.php" class="dropdown-item">
-                        <i class="fas fa-user-plus"></i>
-                        Registrar
-                    </a>
-                    <a href="reporte_graficos.php" class="dropdown-item">
-                        <i class="fas fa-chart-pie"></i>
-                        Reportes Gráficos
-                    </a>
-                    <a href="regresion.html" class="dropdown-item">
-                        <i class="fas fa-chart-area"></i>
-                        Predicción con Regresión Lineal
-                    </a>
-                </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-arrow-alt-circle-down"></i> Ir a
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="dashboard_admin.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                            <li><a class="dropdown-item" href="formulario.php"><i class="fas fa-plus-circle"></i> &nbsp Formulario</a></li>
+                            <li><a class="dropdown-item" href="estado_activos.php"><i class="fas fa-chart-line"></i> &nbsp Estado Activos</a></li>
+                            <li><a class="dropdown-item" href="historiales.php"><i class="fas fa-history"></i> &nbsp Historiales</a></li>
+                            <li><a class="dropdown-item" href="reportes.php"><i class="fas fa-file-alt"></i> &nbsp Reportes</a></li>
+                            <li><a class="dropdown-item" href="reporte_graficos.php"><i class="fas fa-chart-pie"></i> &nbsp Reportes Gráficos</a></li>
+                            <li><a class="dropdown-item" href="regresion.php"><i class="fas fa-project-diagram"></i> &nbsp Regresión</a></li>
+                            <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     

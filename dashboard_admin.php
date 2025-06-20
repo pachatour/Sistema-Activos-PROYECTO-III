@@ -1,3 +1,7 @@
+<?php
+require 'conexion.php';
+include 'verificar_sesion.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -131,11 +135,15 @@
       }
     }
   </style>
+
+      <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="dashboard_admin.html">
+      <a class="navbar-brand" href="dashboard_admin.php">
         <i class="fas fa-hand-holding"></i> INICIO DASHBOARD
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -166,7 +174,7 @@
       <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
     </svg>Reportes</a>
     <a href="reporte_graficos.php" class="menu-item"><i class="fas fa-chart-pie"></i>Reportes gráficos</a>
-    <a href="regresion.html" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#FFD700" class="bi bi-file-earmark-spreadsheet-fill" viewBox="0 0 16 16">
+    <a href="regresion.php" class="menu-item"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#FFD700" class="bi bi-file-earmark-spreadsheet-fill" viewBox="0 0 16 16">
       <path d="M6 12v-2h3v2z"/>
       <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M3 9h10v1h-3v2h3v1h-3v2H9v-2H6v2H5v-2H3v-1h2v-2H3z"/>
       </svg>Predicción con Regresión</a>

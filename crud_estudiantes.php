@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-
+include 'verificar_sesion.php';
 // Acción POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
     $tipo = $_POST['tipo'] ?? 'estudiante';
@@ -69,53 +69,38 @@ if (isset($_GET['editar'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="stylesara.css">
+
+    
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgba(0, 30, 60, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <div class="container-fluid">
-        <!-- Logo y título -->
-        <a class="navbar-brand" href="crud_estudiantes.php">
-           <i class='fas fa-user-friends' style='font-size:24px'></i>
-            <span class="d-none d-sm-inline">USUARIOS DE BIBLIOTECA</span>
+        <a class="navbar-brand" href="biblio_dashboard.php">
+            <i class="fas fa-boxes"></i>
+            <span class="d-none d-sm-inline">ADMINISTRACIÓN DE USUARIOS</span>
         </a>
-        
-        <!-- Botón hamburguesa para móviles -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-bars"></i>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        
-        <!-- Menú de navegación -->
-        <div class="collapse navbar-collapse" id="navbarNav">
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="biblio_dashboard.php">
-                        <i class="fa-brands fa-wpforms"></i> Dashboard
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-arrow-alt-circle-down"></i> Ir a 
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="prestamos.php">
-                        <i class="fas fa-exchange-alt me-1"></i> Préstamos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="crud_libros.php">
-                        <i class="fas fa-book me-1"></i> Libros
-                    </a>
-                </li>
-                <!--<li class="nav-item">
-                    <a class="nav-link active" href="crud_estudiantes.php">
-                        <i class="fas fa-users me-1"></i> Crear Usuarios
-                    </a>
-                </li>-->
-                <li class="nav-item">
-                    <a class="nav-link active" href="reporte_libros.php">
-                        <i class="fas fa-chart-bar me-1"></i> Reportes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger logout-link" href="logout.php">
-                        <i class="fas fa-sign-out-alt me-1"></i><b> Cerrar Sesión</b>
-                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="biblio_dashboard.php"><i class="fas fa-home"></i> &nbsp; Inicio</a></li>
+                        <li><a class="dropdown-item" href="prestamos.php"><i class='fas fa-cubes'></i> &nbsp; Prestar </a></li>
+                        <li><a class="dropdown-item" href="reporte_libros.php"><i class="fas fa-chart-line"></i> &nbsp; Reportes</a></li>
+                        <li><a class="dropdown-item" href="crud_libros.php"><i class="fas fa-file-alt"></i> &nbsp; Libros</a></li>
+                        <li><a class="dropdown-item" href="dashboard_prestamos.php"><i class="fas fa-history"></i> &nbsp; Prestamos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt"></i> &nbsp; Cerrar Sesión</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>
@@ -254,5 +239,26 @@ if (isset($_GET['editar'])) {
 
     window.onload = mostrarCamposPorTipo;
 </script>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #002244; color: #fff;">
+        <div class="modal-header">
+            <h5 class="modal-title" id="logoutModalLabel"><i class="fas fa-exclamation-circle text-warning"></i> Confirmar salida</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+            ¿Estás seguro de que deseas cerrar sesión?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <a href="logout.php" class="btn btn-danger">Cerrar sesión</a>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
